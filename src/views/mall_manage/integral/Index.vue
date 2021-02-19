@@ -48,6 +48,7 @@
 									</el-table-column>
 									<el-table-column
 										align="center"
+										width="180"
 										label="操作">
 										<template slot-scope="scope">
 											<el-button type="text" @click="onHandleEdi(scope.row)">编辑</el-button>
