@@ -1,0 +1,122 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+.container::-webkit-scrollbar { width: 0 !important }
+.container{
+	height: 760px;
+	overflow-y: auto;
+	-ms-overflow-style: none;
+	overflow: -moz-scrollbars-none;
+}
+
+ul {
+	list-style: none;
+}
+
+.flex {
+	display: flex;
+}
+.marg-top10 {
+	margin-top: 10px;
+}
+.marg-top20 {
+	margin-top: 20px;
+}
+.marg-top50 {
+	margin-top: 50px;
+}
+.marg-right30 {
+	margin-right: 30px;
+}
+.marg-letf20{
+	margin-left: 20px;
+}
+.flex-mid {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.flex-mid2 {
+	display: flex;
+	justify-content: center;
+}
+.flex-end {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.b-form {
+	width: 50%;
+}
+
+.flex-column {
+	display: flex;
+	flex-direction: column;
+}
+
+.img-size24 {
+	height: 24px;
+	width: 24px;
+}
+.img-size18 {
+	height: 18px;
+	width: 18px;
+}
+.marg0 {
+	margin-left: 0 !important;
+	margin-top: 10px;
+}
+
+
+.text-algin-left {
+	text-align: right;
+}
+
+.text-algin-center {
+	text-align: center;
+}
+
+/* 字体大小 */
+.fontSize16 {
+	font-size: 16px;
+}
+
+.fontSize14 {
+	font-size: 14px;
+}
+
+.fontSize18 {
+	font-size: 18px;
+}
+
+.fontSize20 {
+	font-size: 20px;
+}
+
+.fontSize24 {
+	font-size: 24px;
+}
+
+/* 字体样式 */
+/* @font-face {
+	font-family: test;
+	src: url(../font/FZYanZQKSJF.TTF);
+} */
+
+	.in-animate{
+		animation: zoomIn .5s;
+	}
+	.bounceOut{
+		animation: bounceOut 1s;
+	}
+	@keyframes zoomIn {
+	  from {
+	    opacity: 0;
+	    transform: scale3d(0.3, 0.3, 0.3);
+	  }
+	
+	  50% {
+	    opacity: 1;
+	  }
+	}
