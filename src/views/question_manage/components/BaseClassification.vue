@@ -3,7 +3,7 @@
 		
 		<el-row>
 			<h4>题库分类</h4>
-		  <el-col :span="24"><div class="grid-content bg-purple-dark marg-top20" >
+		  <el-col :span="24"><div class="grid-content bg-purple-dark marg-top20 " >
 				<el-select 
 					v-model="value" 
 					placeholder="请选择课程" 
@@ -21,12 +21,17 @@
 			</div></el-col>
 		</el-row>
 		<el-row>
-		  <el-col :span="24"><div class="grid-content bg-purple-dark marg-top20">
+		  <el-col :span="24"><div class="grid-content bg-purple-dark marg-top20 over-x">
 				<el-tree
 				  :data="courseSectionTree"
 				  :props="defaultProps"
 				  accordion
 				  @node-click="handleNodeClick">
+					<div slot-scope="{ node, data }">
+						<el-tooltip class="item" effect="light" :content="node.label" placement="top">
+							<span>{{node.label}}</span>
+						</el-tooltip>
+					</div>
 				</el-tree>
 			</div></el-col>
 		</el-row>
@@ -113,5 +118,9 @@
 		li{
 			margin-right: 15px;
 		}
+	}
+	.over-x{
+		overflow-x: auto;
+		height: 565px;
 	}
 </style>

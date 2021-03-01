@@ -33,15 +33,33 @@
 							</div>
 						</el-col>
 					</el-row>
-					<el-row class="marg-top20">
-						<el-col :span="3"><div class="grid-content bg-purple-dark">
-							<el-tree 
+					<el-row class="marg-top20" :gutter="20">
+						<el-col :span="4"><div class="grid-content bg-purple-dark">
+						<el-card class="box-card over-tree-x" shadow="never" style="overflow-y:scroll;height: 650px;">
+							<el-tree
 								:data="orgList" 
-								 default-expand-all
+								node-key="orgCode"
+								accordion
+								 :default-expanded-keys="['ZGS']"
 								:props="{children:'childrenOrg',label:'orgName'}" 
-								@node-click="handleNodeClick"></el-tree>
+								@node-click="handleNodeClick">
+									<div class="showname" slot-scope="{ node, data }">
+										<el-tooltip 
+											class="item" 
+											effect="light" 
+											:visible-arrow="false"
+											:content="node.label" placement="top">
+												<span >
+													<img 
+														src="../../assets/images/org.png" 
+														style="width: 12px;height: 12px;">
+													{{node.label}}</span>
+										</el-tooltip>
+									</div>
+								</el-tree>
+						</el-card>
 						</div></el-col>
-						<el-col :span="21">
+						<el-col :span="20">
 							<div class="grid-content bg-purple-dark">
 								<base-table 
 									:total="total" 

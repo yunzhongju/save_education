@@ -2,6 +2,12 @@
 	margin: 0;
 	padding: 0;
 }
+.showname{
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	display: block;
+}
 .container::-webkit-scrollbar { width: 0 !important }
 .container{
 	height: 760px;

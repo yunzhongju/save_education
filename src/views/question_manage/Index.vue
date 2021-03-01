@@ -45,11 +45,11 @@
 									</ul>
 								</div></el-col>
 							</el-row>
-							<el-row class="marg-top20">
-								<el-col :span="3"><div class="grid-content bg-purple">
+							<el-row class="marg-top20" :gutter="20">
+								<el-col :span="4"><div class="grid-content bg-purple">
 									<base-classification @getNode="getNode"></base-classification>
 								</div></el-col>
-							  <el-col :span="21"><div class="grid-content bg-purple-dark">
+							  <el-col :span="20"><div class="grid-content bg-purple-dark">
 									<base-table
 									:total="total"
 									@getPageSize="getPageSize"
@@ -77,13 +77,6 @@
 												prop="questionName"
 												label="题干"
 												align="center"
-												>
-											</el-table-column>
-											<el-table-column
-												prop="questionIndex"
-												label="题号"
-												align="center"
-												width="50"
 												>
 											</el-table-column>
 											<el-table-column

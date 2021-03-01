@@ -38,28 +38,28 @@
 					</div></el-col>
 				</el-row>
 			</el-form-item>
-			<el-form-item label="省份" prop="desc">
+			<el-form-item label="省份">
 			  <el-input type="text" v-model="form.province"></el-input>
 			</el-form-item>
-			<el-form-item label="城市" prop="desc">
+			<el-form-item label="城市">
 			  <el-input type="text" v-model="form.city"></el-input>
 			</el-form-item>
-			<el-form-item label="区县" prop="desc">
+			<el-form-item label="区县" >
 			  <el-input type="text" v-model="form.district"></el-input>
 			</el-form-item>
-			<el-form-item label="详细地址" prop="desc">
+			<el-form-item label="详细地址" >
 			  <el-input type="text" v-model="form.address"></el-input>
 			</el-form-item>
-			<el-form-item label="联系人" prop="linkman">
+			<el-form-item label="联系人" >
 			  <el-input type="text" v-model="form.linkman"></el-input>
 			</el-form-item>
-			<el-form-item label="联系电话" prop="linkphone">
+			<el-form-item label="联系电话" >
 			  <el-input type="text" v-model="form.linkphone"></el-input>
 			</el-form-item>
-			<el-form-item label="排序" prop="sort">
+			<el-form-item label="排序" >
 			  <el-input type="text" v-model="form.sort"></el-input>
 			</el-form-item>
-			<el-form-item label="备注" prop="desc">
+			<el-form-item label="备注">
 			  <el-input type="textarea" v-model="form.remark"></el-input>
 			</el-form-item>
 		  <el-form-item>

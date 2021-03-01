@@ -2,7 +2,7 @@
 	<div class="in-animate">
 		<base-tabs @onBaseTabClick="onBaseTabClick" :baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="">
+				<div class="con">
 					<el-row>
 						<el-col :span="12">
 							<div class="grid-content bg-purple-light">
@@ -27,20 +27,36 @@
 						</el-col>
 					</el-row>
 					<el-row class="marg-top20" :gutter="10">
-					  <el-col :span="4"><div class="grid-content bg-purple ">
-						<el-card class="box-card">
+					  <el-col :span="5"><div class="grid-content bg-purple ">
+						<el-card class="box-card over-tree-x">
 							<el-tree 
 								:data="orgList" 
-								 default-expand-all
+								node-key="orgCode"
 								:props="defaultProps" 
-								@node-click="handleNodeClick"></el-tree>
+								accordion
+								:default-expanded-keys="['ZGS']"
+								@node-click="handleNodeClick">
+								<div class="showname" slot-scope="{ node, data }">
+									<el-tooltip 
+										class="item" 
+										effect="light" 
+										:visible-arrow="false"
+										:content="node.label" placement="top">
+											<span >
+												<img 
+													src="../../assets/images/org.png" 
+													style="width: 12px;height: 12px;">
+												{{node.label}}</span>
+									</el-tooltip>
+								</div>
+							</el-tree>
 						</el-card>
 						</div></el-col>
-					  <el-col :span="20"><div class="grid-content bg-purple-light">
+					  <el-col :span="19"><div class="grid-content bg-purple-light">
 							<el-card class="box-card">
 							  <el-tabs v-model="activeName" @tab-click="handleClick">
 							      <el-tab-pane label="基本信息" name="0">
-							  			<base-detail :detail="orgDeatil"></base-detail>
+							  			<base-detail :detail="orgDeatil" @onHandleUpdate="onHandleUpdate"></base-detail>
 							  		</el-tab-pane>
 							      <el-tab-pane label="下级机构" name="1">
 											<base-table
@@ -357,7 +373,7 @@ export default {
 			secendList:[],
 			activeName:"0",
 			currentOrg:null,
-			orgDeatil:{},
+			orgDeatil:null,
 			defaultProps:{
 				label:'orgName',
 				children:'childrenOrg'
@@ -370,6 +386,14 @@ export default {
 		};
 	},
 	methods: {
+		onHandleUpdate(){
+			this.$router.push({
+				path:'/menu/mechanismCreate',
+				query:{
+					orgCode:this.currentOrg.orgCode
+				}
+			})
+		},
 		getPageSizeUser(val){
 			this.querySysUserByPage({pageNo:1,pageSize:val,orgCode:node.orgCode,orgType:0})
 		},
@@ -514,16 +538,13 @@ export default {
 			})
 		},
 		handleOrgStop(index,row){
-			this.stopSysOrg(row.orgCode)
-		},
-		stopSysOrg(code){
 			this.$confirm('此操作将停用该机构/小组, 是否继续?', '提示', {
 				confirmButtonText: '确定',
 				cancelButtonText: '取消',
 				type: 'warning'
 			})
 				.then(() => {
-					api.stopSysOrgAPI({orgCode:code}).then(res=>{
+					api.stopSysOrgAPI({orgCode:row.orgCode}).then(res=>{
 						if(res.code==0){
 							this.$message({
 								type: 'success',
@@ -717,8 +738,16 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 	.box-card{
 		height: 700px;
+		overflow-y: auto;
 	}
+.showname{
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	display: block;
+}
+
 </style>
