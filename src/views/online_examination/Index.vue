@@ -70,8 +70,7 @@
 										v-loading="loading"
 										tooltip-effect="dark"
 										max-height="650"
-										height="650"
-										@selection-change="handleSelectionChange">
+										height="650">
 										<el-table-column
 											label="编号"
 											prop="id"
@@ -206,6 +205,13 @@ export default {
 		//删除
 		handleDeletePlan(index,row){
 			// console.log(row);
+			if(!this.isAbleDelete(row.begDate,row.endDate)){
+				this.$message({
+					type: 'warning',
+					message: '正在考试，无法删除!'
+				});
+				return
+			}
 			this.$confirm('此操作将删除该考试计划, 是否继续?', '提示', {
 				confirmButtonText: '确定',
 				cancelButtonText: '取消',
@@ -228,8 +234,15 @@ export default {
 			});
 		},
 		//选中数据
-		handleSelectionChange(val){
-			// console.log(val);
+		isAbleDelete(t1,t2){
+			let begDate=new Date(t1).getTime()
+			let endDate=new Date(t2).getTime()
+			let currentDate=new Date().getTime()
+			if(currentDate>begDate&&currentDate<endDate){
+				return false
+			}else{
+				return true
+			}
 		},
 		//按时间筛选
 		handleDateTime(val){

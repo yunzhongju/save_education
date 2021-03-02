@@ -58,6 +58,13 @@
 			UploadImg
 		},
     data() {
+		let	validateTime=(rule,value,callback)=>{
+			let currentTime=new Date().getTime()
+			let beginTime=new Date(value[0]).getTime()
+			if(beginTime<currentTime){
+				return callback(new Error('开始时间不能小于当前时间'))
+			}
+		}
       return {
 				id:'',
 				trainDetail:'',
@@ -79,7 +86,8 @@
 					 trainImag: [{ required: true, message: '请上传培训封面', trigger: 'blur' }],
 					 trainAddress: [{ required: true, message: '请输入培训地点', trigger: 'change' }],
 					 remark: [{ required: true, message: '请输入培训描述', trigger: 'blur' }],
-					 time: [{ required: true, message: '请选择时间', trigger: 'blur' }],
+					 time: [{ required: true, message: '请选择时间', trigger: 'blur' },
+					 { validator: validateTime, trigger: 'blur' }],
 					 fileUrl: [{ required: true, message: '请上传培训附件', trigger: 'blur' }],
 					 userCodeList: [{ required: true, message: '请选择培训人员', trigger: 'blur' }],
 				},

@@ -14,8 +14,8 @@
 				    <el-radio label="store">商城</el-radio>
 				  </el-radio-group>
 		  </el-form-item>
-			<el-form-item label="排序" prop="">
-			  <el-input v-model="form.sort"></el-input>
+			<el-form-item label="排序" prop="sort">
+			  <el-input v-model.number="form.sort"></el-input>
 			</el-form-item>
 		  <el-form-item>
 		    <el-button type="primary" @click="onSubmit('form')">{{form.id?'更新':'创建'}}</el-button>
@@ -53,6 +53,7 @@
 					 title: [{ required: true, message: '请输入banner标题', trigger: 'blur' }],
 					 imagePath: [{ required: true, message: '请上传图片', trigger: 'blur' }],
 					 displayLocation: [{ required: true, message: '请选择展示位置', trigger: 'blur' }],
+					 sort: [{ type: 'number', message: '排序必须为数字' }],
 				},
       }
     },

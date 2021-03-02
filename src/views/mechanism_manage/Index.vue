@@ -2,7 +2,7 @@
 	<div class="in-animate">
 		<base-tabs @onBaseTabClick="onBaseTabClick" :baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="con">
+				<div class="container">
 					<el-row>
 						<el-col :span="12">
 							<div class="grid-content bg-purple-light">
@@ -28,7 +28,7 @@
 					</el-row>
 					<el-row class="marg-top20" :gutter="10">
 					  <el-col :span="5"><div class="grid-content bg-purple ">
-						<el-card class="box-card over-tree-x">
+						<el-card class="box-card">
 							<el-tree 
 								:data="orgList" 
 								node-key="orgCode"
@@ -740,7 +740,7 @@ export default {
 
 <style scoped>
 	.box-card{
-		height: 700px;
+		height: 693px;
 		overflow-y: auto;
 	}
 .showname{

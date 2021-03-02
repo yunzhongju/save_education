@@ -19,7 +19,7 @@
 			  <el-input type="text" v-model="form.source"></el-input>
 			</el-form-item>
 			<el-form-item label="浏览量" prop="vmReadNumber">
-			  <el-input type="text" v-model="form.vmReadNumber"></el-input>
+			  <el-input type="text" v-model.number="form.vmReadNumber"></el-input>
 			</el-form-item>
 			<el-form-item label="内容" prop="content">
 			  <base-editor @input="getContent" :text="form.content"></base-editor>
@@ -66,7 +66,8 @@
 					 content: [{ required: true, message: '请编写资讯内容', trigger: 'blur' }],
 					 source: [{ required: true, message: '请输入资讯来源', trigger: 'blur' }],
 					 imagePath: [{ required: true, message: '请上传资讯封面', trigger: 'blur' }],
-					 vmReadNumber: [{ required: true, message: '请输入浏览量', trigger: 'blur' }],
+					 vmReadNumber: [{ required: true, message: '请输入浏览量', trigger: 'blur' },
+					 {type:'number',message:'浏览量必须为数字'}],
 					 channelId: [{ required: true, message: '请选择所属栏目', trigger: 'blur' }],
 				},
       }

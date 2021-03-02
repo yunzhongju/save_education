@@ -35,7 +35,7 @@
 					</el-row>
 					<el-row class="marg-top20" :gutter="20">
 						<el-col :span="4"><div class="grid-content bg-purple-dark">
-						<el-card class="box-card over-tree-x" shadow="never" style="overflow-y:scroll;height: 650px;">
+						<el-card class="" shadow="never" >
 							<el-tree
 								:data="orgList" 
 								node-key="orgCode"

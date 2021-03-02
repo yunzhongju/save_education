@@ -2,10 +2,10 @@
   <div>
 		<el-form ref="form" :model="form" :rules="rulesForm" label-width="100px">
 		  <el-form-item label="公告标题" prop="title">
-		    <el-input v-model="form.title"></el-input>
+		    <el-input v-model="form.title" clearable></el-input>
 		  </el-form-item>
 			<el-form-item label="发布单位" prop="creator">
-			  <el-input v-model="form.creator"></el-input>
+			  <el-input v-model="form.creator" clearable></el-input>
 			</el-form-item>
 			<el-form-item label="公告时间" prop="time">
 				<el-date-picker
@@ -33,7 +33,7 @@
 				:leftList="form.receiver.length!==0?form.receiver:[]"></base-transfer>
 			</el-form-item>
 			<el-form-item label="公告内容" prop="content">
-			 <base-editor @input="getContent" :text="form.content"></base-editor>
+			 <base-editor @input="getContent" :text="form.content" ></base-editor>
 			</el-form-item>
 		  <el-form-item>
 		    <el-button type="primary" @click="onSubmit('form')">{{form.id?'更新':'创建'}}</el-button>
@@ -57,6 +57,13 @@
 			BaseTransfer
 		},
     data() {
+			let	validateTime=(rule,value,callback)=>{
+				let currentTime=new Date().getTime()
+				let beginTime=new Date(value[0]).getTime()
+				if(beginTime<currentTime){
+					return callback(new Error('开始时间不能小于当前时间'))
+				}
+			}
       return {
         form: {
 					id:'',
@@ -72,7 +79,8 @@
 				rulesForm:{
 					 title: [{ required: true, message: '请输入公告标题', trigger: 'blur' }],
 					 receiver: [{ required: true, message: '请选择公告对象', trigger: 'blur' }],
-					 time: [{ required: true, message: '请选择日期时间', trigger: 'change' }],
+					 time: [{ required: true, message: '请选择日期时间', trigger: 'blur' },
+									{ validator: validateTime, trigger: 'blur' }],
 					 content: [{ required: true, message: '请输入公告详情', trigger: 'blur' }],
 					 creator: [{ required: true, message: '请输入发布单位', trigger: 'blur' }],
 				},

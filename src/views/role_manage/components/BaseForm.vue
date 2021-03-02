@@ -10,8 +10,8 @@
 		  <el-form-item label="姓名" prop="userName">
 		    <el-input v-model="form.userName"></el-input>
 		  </el-form-item>
-			<el-form-item label="等级" prop="">
-			  <el-input v-model="form.level"></el-input>
+			<el-form-item label="等级" prop="level">
+			  <el-input v-model.number="form.level"></el-input>
 			</el-form-item>
 			<el-form-item label="出生日期" prop="">
 			  <el-date-picker
@@ -80,6 +80,14 @@
 			}
 		},
     data() {
+			let validatePhone=(rule, value, callback)=>{
+				let repx=/^[1][3,4,5,7,8,9][0-9]{9}$/;
+				let repx2=/(0511-4405222、021-87888822)：\d{3}-\d{8}|\d{4}-\d{7}/
+				if(!repx.test(value)&&!repx2.test(value)){
+					return callback(new Error('格式不正确'));
+				}
+			};
+			
       return {
 				checkList:[],
 				orgList:[],
@@ -101,10 +109,12 @@
 				rulesForm:{
 					 userCode: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
 					 userName: [{ required: true, message: '请输入用户姓名', trigger: 'blur' }],
-					 mobileNo: [{ required: true, message: '请输入用户手机号', trigger: 'blur' }],
+					 mobileNo: [{ required: true, message: '请输入用户手机号', trigger: 'blur' },
+											{ validator: validatePhone, trigger: 'blur' }],
 					 orgCode: [{ required: true, message: '请选择机构', trigger: 'change' }],
 					 roleCodes: [{ required: true, message: '请添加角色', trigger: 'blur' }],
 					 loginAuthor: [{ required: true, message: '请选择登陆权限', trigger: 'blur' }],
+					 level: [{ type: 'number', message: '等级必须为数字值'}],
 				},
       }
     },

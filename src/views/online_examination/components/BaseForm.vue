@@ -2,19 +2,20 @@
   <div>
 		<el-form ref="form" :model="form" :rules="rulesForm" label-width="100px">
 		  <el-form-item label="考试名称" prop="name">
-		    <el-input v-model="form.name"></el-input>
+		    <el-input v-model="form.name" clearable></el-input>
 		  </el-form-item>
 		  <el-form-item label="考试简介" prop="desc">
-		   <el-input v-model="form.desc"></el-input>
+		   <el-input v-model="form.desc" clearable></el-input>
 		  </el-form-item>
 			<el-form-item label="考试次数" prop="count">
-			 <el-input v-model="form.count"></el-input>
+			 <el-input v-model.number="form.count" clearable></el-input>
 			</el-form-item>
 		  <el-form-item label="考试时间" prop="time">
 				<el-date-picker
 					v-model="form.time"
 					type="datetimerange"
 					range-separator="至"
+					@change="onHandleTimeChange"
 					value-format="yyyy-MM-dd H:mm:ss"
 					start-placeholder="开始日期"
 					end-placeholder="结束日期">
@@ -27,7 +28,7 @@
 			   </el-radio-group>
 			</el-form-item>
 			<el-form-item label="考试地点" prop="addr">
-			 <el-input v-model="form.addr"></el-input>
+			 <el-input v-model="form.addr" clearable></el-input>
 			</el-form-item>
 			<el-form-item label="考试人员" prop="userList">
 			 <base-transfer @getUserList="getUserList" :leftList="form.userList"></base-transfer>
@@ -127,11 +128,24 @@
 					 exam: [{ required: true, message: '请选中考试试卷', trigger: 'blur' }],
 					 addr: [{ required: true, message: '请输入考试地点', trigger: 'blur' }],
 					 type: [{ required: true, message: '请选择考试类型', trigger: 'blur' }],
-					 count: [{ required: true, message: '请输入考试次数', trigger: 'blur' }],
+					 count: [{ required: true, message: '请输入考试次数', trigger: 'blur' },
+									{ type: 'number', message: '次数必须为数字值'}],
 				},
       }
     },
     methods: {
+			onHandleTimeChange(val){
+				// console.log(val);
+				let beginTime=new Date(val[0]).getTime()
+				let currentTime=new Date().getTime()
+				if(beginTime<currentTime){
+					this.$message({
+						type:'warning',
+						message:'开始时间不能小于当前时间'
+					})
+					this.form.time=[]
+				}
+			},
 			handleChooseType(val){
 				// console.log(val);
 				this.form.type=val

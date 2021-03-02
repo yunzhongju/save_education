@@ -5,27 +5,27 @@
 			<el-form-item 
 				label="试卷名称" 
 				prop="name">
-					<el-input v-model="form.name"></el-input>
+					<el-input v-model="form.name" clearable></el-input>
 				</el-form-item>
 			<el-form-item 
 				label="试卷说明" 
 				prop="desc">
-					<el-input v-model="form.desc"></el-input>
+					<el-input v-model="form.desc" clearable></el-input>
 				</el-form-item>
 			<el-form-item 
 				label="答卷时长" 
 				prop="time">
-					<el-input v-model="form.time"></el-input>
+					<el-input v-model.number="form.time" clearable></el-input>
 				</el-form-item>
 			<el-form-item 
 				label="满分" 
 				prop="full_score">
-					<el-input v-model="form.full_score"></el-input>
+					<el-input v-model="form.full_score" clearable></el-input>
 				</el-form-item>
 			<el-form-item 
 				label="及格分数" 
 				prop="pass_score">
-				<el-input v-model="form.pass_score"></el-input>
+				<el-input v-model="form.pass_score" clearable></el-input>
 			</el-form-item>
 			<el-form-item label="分数构成" prop="score_constrc">
 				<el-row>
@@ -33,7 +33,7 @@
 						<div class="grid-content bg-purple">
 							<el-form-item 
 								label="单选题数量">
-								<el-input v-model="form.single_num"></el-input>
+								<el-input v-model="form.single_num" clearable></el-input>
 							</el-form-item>
 						</div>
 					</el-col>
@@ -41,7 +41,7 @@
 						<div class="grid-content bg-purple-light">
 							<el-form-item 
 								label="每题分数">
-									<el-input v-model="form.single_score"></el-input>
+									<el-input v-model="form.single_score" clearable></el-input>
 							</el-form-item>
 						</div>
 					</el-col>
@@ -51,7 +51,7 @@
 						<div class="grid-content bg-purple">
 							<el-form-item 
 								label="多选题数量">
-								<el-input v-model="form.multiple_num"></el-input>
+								<el-input v-model="form.multiple_num" clearable></el-input>
 							</el-form-item>
 						</div>
 					</el-col>
@@ -59,7 +59,7 @@
 						<div class="grid-content bg-purple-light">
 							<el-form-item 
 								label="每题分数">
-								<el-input v-model="form.multiple_score"></el-input>
+								<el-input v-model="form.multiple_score" clearable></el-input>
 							</el-form-item>
 						</div>
 					</el-col>
@@ -69,7 +69,7 @@
 						<div class="grid-content bg-purple">
 							<el-form-item 
 								label="判断题数量">
-								<el-input v-model="form.t_or_f_num"></el-input>
+								<el-input v-model="form.t_or_f_num" clearable></el-input>
 							</el-form-item>
 						</div>
 					</el-col>
@@ -77,7 +77,7 @@
 						<div class="grid-content bg-purple-light">
 							<el-form-item 
 								label="每题分数">
-								<el-input v-model="form.t_or_f_score"></el-input>
+								<el-input v-model="form.t_or_f_score" clearable></el-input>
 							</el-form-item>
 						</div>
 					</el-col>
@@ -212,9 +212,12 @@ export default {
 			rulesForm: {
 				name: [{ required: true, message: '请输入试卷名称', trigger: 'blur' }],
 				desc: [{ required: true, message: '请输入试卷简介', trigger: 'blur' }],
-				time: [{ required: true, message: '请输入答卷时长', trigger: 'change' }],
-				full_score: [{ required: true, message: '请输入试卷满分值', trigger: 'blur' }],
-				pass_score: [{ required: true, message: '请设置及格分数', trigger: 'blur' }],
+				time: [{ required: true, message: '请输入答卷时长', trigger: 'change' },
+							 { type: 'number', message: '时长必须为数字值'}],
+				full_score: [{ required: true, message: '请输入试卷满分值', trigger: 'blur' },
+				{ type: 'number', message: '满分值必须为数字值'}],
+				pass_score: [{ required: true, message: '请设置及格分数', trigger: 'blur' },
+				{ type: 'number', message: '及格分数必须为数字值'}],
 				rel_test: [{ required: true, message: '请选中题目', trigger: 'blur' }],
 				score_constrc: [{ required: true, message: '请输入分数构成', trigger: 'blur' }]
 			}

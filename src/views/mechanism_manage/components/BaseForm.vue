@@ -2,10 +2,10 @@
   <div>
 		<el-form ref="form" :model="form" :rules="rulesForm" label-width="100px">
 		  <el-form-item label="机构代码" prop="orgCode">
-		    <el-input type="text" v-model="form.orgCode"></el-input>
+		    <el-input type="text" v-model="form.orgCode" clearable></el-input>
 		  </el-form-item>
 			<el-form-item label="机构名称" prop="orgName">
-			  <el-input type="text" v-model="form.orgName"></el-input>
+			  <el-input type="text" v-model="form.orgName" clearable></el-input>
 			</el-form-item>
 			<el-form-item label="机构类型" prop="orgType">
 			  <el-radio-group v-model="form.orgType">
@@ -25,7 +25,7 @@
 			<el-form-item label="所属机构" prop="parentCode">
 				<el-row>
 				  <el-col :span="24"><div class="grid-content bg-purple-dark">
-						<el-input type="text" v-model="form.parentName"></el-input>
+						<el-input type="text" v-model="form.parentName" clearable></el-input>
 					</div></el-col>
 				</el-row>
 				<el-row>
@@ -39,28 +39,28 @@
 				</el-row>
 			</el-form-item>
 			<el-form-item label="省份">
-			  <el-input type="text" v-model="form.province"></el-input>
+			  <el-input type="text" v-model="form.province" clearable></el-input>
 			</el-form-item>
 			<el-form-item label="城市">
-			  <el-input type="text" v-model="form.city"></el-input>
+			  <el-input type="text" v-model="form.city" clearable></el-input>
 			</el-form-item>
 			<el-form-item label="区县" >
-			  <el-input type="text" v-model="form.district"></el-input>
+			  <el-input type="text" v-model="form.district" clearable></el-input>
 			</el-form-item>
 			<el-form-item label="详细地址" >
-			  <el-input type="text" v-model="form.address"></el-input>
+			  <el-input type="text" v-model="form.address" clearable></el-input>
 			</el-form-item>
 			<el-form-item label="联系人" >
-			  <el-input type="text" v-model="form.linkman"></el-input>
+			  <el-input type="text" v-model="form.linkman" clearable></el-input>
 			</el-form-item>
-			<el-form-item label="联系电话" >
-			  <el-input type="text" v-model="form.linkphone"></el-input>
+			<el-form-item label="联系电话" prop="linkphone">
+			  <el-input type="text" v-model="form.linkphone" clearable></el-input>
 			</el-form-item>
-			<el-form-item label="排序" >
-			  <el-input type="text" v-model="form.sort"></el-input>
+			<el-form-item label="排序" prop="sort">
+			  <el-input type="text" v-model.number="form.sort" clearable></el-input>
 			</el-form-item>
 			<el-form-item label="备注">
-			  <el-input type="textarea" v-model="form.remark"></el-input>
+			  <el-input type="textarea" v-model="form.remark" clearable></el-input>
 			</el-form-item>
 		  <el-form-item>
 		    <el-button type="primary" @click="onSubmit('form')">{{form.id?'更新':'创建'}}</el-button>
@@ -81,6 +81,14 @@
 			BaseTable
 		},
     data() {
+			let validatePhone=(rule, value, callback)=>{
+				let repx=/^[1][3,4,5,7,8,9][0-9]{9}$/;
+				let repx2=/(0511-4405222、021-87888822)：\d{3}-\d{8}|\d{4}-\d{7}/
+				if(!repx.test(value)&&!repx2.test(value)){
+					return callback(new Error('格式不正确'));
+				}
+			};
+			
       return {
 				orgList:[],
 				defaultProps:{
@@ -103,8 +111,8 @@
 					district:'',
 					address:'',
 					linkman:'',
-					linkphone:'',
-					sort:'',
+					linkphone:null,
+					sort:null,
 					remark:'',
         },
 				rulesForm:{
@@ -114,8 +122,8 @@
 					 parentCode: [{ required: true, message: '请选择所属机构', trigger: 'blur' }],
 					 orgType: [{ required: true, message: '请选择机构类型', trigger: 'blur' }],
 					 linkman: [{ required: true, message: '请输入联系人', trigger: 'blur' }],
-					 linkphone: [{ required: true, message: '请输入联系方式', trigger: 'blur' }],
-					 sort: [{ required: true, message: '请输入排序', trigger: 'blur' }],
+					 linkphone: [{ validator: validatePhone, trigger: 'blur' }],
+					 sort: [{ type: 'number', message: '排序必须为数字值'}],
 				},
       }
     },
