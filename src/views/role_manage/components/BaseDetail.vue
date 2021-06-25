@@ -35,7 +35,7 @@
 			<el-row :gutter="20">
 			  <el-col :span="12"><div class="grid-content bg-purple">
 					<el-form-item label="权限:">
-						<span>{{ detail.loginAuthor==0?'管理员':detail.loginAuthor==1?'学员':'讲师' }}</span>
+						<span>{{ detail.loginAuthor==1?'管理员':detail.loginAuthor==0?'学员':'讲师' }}</span>
 					</el-form-item>
 				</div></el-col>
 			  <el-col :span="12"><div class="grid-content bg-purple">
@@ -47,7 +47,7 @@
 			<el-row :gutter="20">
 			  <el-col :span="12"><div class="grid-content bg-purple">
 					<el-form-item label="机构:">
-						<span>{{ detail.orgName }}</span>
+						<span>{{detail.parentOrgName}}/{{ detail.orgName }}</span>
 					</el-form-item>
 				</div></el-col>
 			  <el-col :span="12"><div class="grid-content bg-purple">
@@ -75,9 +75,9 @@
 			  	</el-form-item>
 			  </div></el-col>
 			  <el-col :span="12"><div class="grid-content bg-purple">
-			  	<el-form-item label="更新时间:">
+			  	<!-- <el-form-item label="更新时间:">
 			  		<span>{{detail.updateTime }}</span>
-			  	</el-form-item>
+			  	</el-form-item> -->
 			  </div></el-col>
 			</el-row>
 			<el-row :gutter="20">
@@ -109,7 +109,7 @@
 		created() {
 			api.querySysRoleListAPI().then(res=>{
 				if(res.code==0){
-					// console.log('角色列表',res);
+					// // console.log('角色列表',res);
 					this.roleList=res.data
 				}
 			})

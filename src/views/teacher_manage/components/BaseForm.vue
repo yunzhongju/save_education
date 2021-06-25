@@ -92,7 +92,7 @@
 							orgCode:this.form.orgCode,
 							integral:this.form.integral
 						}
-						// console.log(params);
+						// // console.log(params);
 						if(!this.form.id){
 							api.addTeacherAPI(params).then(res=>{
 								if(res.code==0){

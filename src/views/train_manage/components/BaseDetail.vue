@@ -59,10 +59,8 @@
 							tooltip-effect="dark"
 							max-height="250">
 							<el-table-column
-								label="编号"
-								prop="id"
-								width="55"
-								>
+								type="index"
+								width="55">
 							</el-table-column>
 							<el-table-column
 								label="姓名"
@@ -77,11 +75,6 @@
 								<template slot-scope="scope">
 									<span>{{scope.row.isComplete==0?'未完成':'完成'}}</span>
 								</template>
-							</el-table-column>
-							<el-table-column
-								label="编码"
-								prop="studentCode"
-								>
 							</el-table-column>
 						</el-table>
 					</el-form-item>

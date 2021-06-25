@@ -29,7 +29,7 @@ export default {
 	},
 	methods: {
 		handleTabClick(tab) {
-			// console.log(tab);
+			// // console.log(tab);
 			this.$emit('onBaseTabClick',tab.name)
 		}
 	}

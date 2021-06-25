@@ -71,10 +71,8 @@
 							tooltip-effect="dark"
 							max-height="250">
 							<el-table-column
-								label="编号"
-								prop="id"
-								width="55"
-								>
+								type="index"
+								width="55">
 							</el-table-column>
 							<el-table-column
 								label="题目"
@@ -83,7 +81,8 @@
 							</el-table-column>
 							<el-table-column
 								label="类型"
-								prop=""
+								align="center"
+								width="80"
 								>
 								<template slot-scope="scope">
 									<span>{{scope.row.questionType==1?'单选题':scope.row.questionType==2?'多选题':'判断题'}}</span>
@@ -91,6 +90,8 @@
 							</el-table-column>
 							<el-table-column
 								label="答案"
+								width="80"
+								align="center"
 								prop="answer"
 								>
 							</el-table-column>

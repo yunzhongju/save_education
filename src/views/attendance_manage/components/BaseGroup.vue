@@ -63,7 +63,7 @@
 								prop=""
 								>
 								<template slot-scope="scope">
-									<span>{{scope.row.sex==1?'男':'女'}}</span>
+									<span>{{scope.row.sex==0?'男':'女'}}</span>
 								</template>
 							</el-table-column>
 							<el-table-column

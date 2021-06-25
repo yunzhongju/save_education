@@ -79,8 +79,8 @@
 			}
 		},
 		created() {
-			
 		},
+		
 		mounted() {
 			this.$refs.menutree.setCheckedKeys(this.detail.menuCodes)
 		}

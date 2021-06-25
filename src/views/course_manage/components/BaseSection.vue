@@ -64,7 +64,7 @@ export default {
 			})
 		},
 		handleDeleteSection(node){
-			// console.log(node);
+			// // console.log(node);
 			this.$confirm('此操作将删除该章节, 是否继续?', '提示', {
 				confirmButtonText: '确定',
 				cancelButtonText: '取消',

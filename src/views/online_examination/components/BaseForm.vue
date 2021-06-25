@@ -31,7 +31,9 @@
 			 <el-input v-model="form.addr" clearable></el-input>
 			</el-form-item>
 			<el-form-item label="考试人员" prop="userList">
-			 <base-transfer @getUserList="getUserList" :leftList="form.userList"></base-transfer>
+			 <!-- <base-transfer @getUserList="getUserList" :leftList="form.userList"></base-transfer> -->
+			 <SelectUser @getUserCodes="getUserList" v-if="!examCode"></SelectUser>
+			 <SelectUser @getUserCodes="getUserList" v-if="examCode && planDetail" ></SelectUser>
 			</el-form-item>
 			<el-form-item label="考试试卷" prop="exam">
 			 <el-input v-model="form.exam" clearable></el-input>
@@ -94,17 +96,17 @@
 <script>
 	import BaseTransfer from '../../../components/BaseTransfer.vue'
 	import BaseTable from '../../../components/BaseTable.vue'
+	import SelectUser from '../../../components/SelectUser.vue'
 	import api from '../../../api/api.js'
   export default {
 		components:{
 			BaseTable,
-			BaseTransfer
-		},
-		props:{
-
+			BaseTransfer,
+			SelectUser
 		},
     data() {
       return {
+				userList:[],
 				examCode:'',
 				planDetail:null,
 				paperList:[],
@@ -123,6 +125,7 @@
         },
 				rulesForm:{
 					 name: [{ required: true, message: '请输入考试名称', trigger: 'blur' }],
+					 userList: [{ required: true, message: '选择考试人员', trigger: 'blur' }],
 					 desc: [{ required: true, message: '请输入考试简介', trigger: 'blur' }],
 					 time: [{ required: true, message: '请选择日期时间', trigger: 'change' }],
 					 exam: [{ required: true, message: '请选中考试试卷', trigger: 'blur' }],
@@ -135,7 +138,7 @@
     },
     methods: {
 			onHandleTimeChange(val){
-				// console.log(val);
+				// // console.log(val);
 				let beginTime=new Date(val[0]).getTime()
 				let currentTime=new Date().getTime()
 				if(beginTime<currentTime){
@@ -147,7 +150,7 @@
 				}
 			},
 			handleChooseType(val){
-				// console.log(val);
+				// // console.log(val);
 				this.form.type=val
 			},
 			getUserList(val){
@@ -174,7 +177,7 @@
 					if (valid) {
 						if(!this.examCode){
 							api.addExamPlanAPI(params).then(res=>{
-								// console.log('ok',res);
+								// // console.log('ok',res);
 								if(res.code==0){
 									this.$message({
 										message:'添加成功',
@@ -190,7 +193,7 @@
 							})
 						}else{
 							params['id']=this.form.id
-							// console.log(params);
+							// // console.log(params);
 							api.updateExamPlanAPI(params).then(res=>{
 								if(res.code==0){
 									this.$message({
@@ -221,7 +224,7 @@
 			},
 			queryPaperList(params={}){
 				api.queryPaperListAPI(params).then(res=>{
-					// console.log('试卷列表',res);
+					// // console.log('试卷列表',res);
 					if(res.code==0){
 						this.paperList=res.data
 					}
@@ -240,7 +243,7 @@
 			this.examCode=this.$route.query.examCode
 			if(this.examCode){
 				api.queryExamPlanDetailAPI({examCode:this.examCode}).then(res=>{
-					// console.log('详情',res);
+					// // console.log('详情',res);
 					this.planDetail=res.data
 					this.form.id=res.data.id
 					this.form.name=res.data.examName
@@ -253,6 +256,8 @@
 					this.form.exam_code=res.data.paperCode
 					this.form.exam=res.data.paperName
 					this.form.userList=this.handleUserList(res.data.userList)
+					this.$store.commit('setUsers',res.data.userList)
+					this.userList=res.data.userList
 				})
 			}
 		}

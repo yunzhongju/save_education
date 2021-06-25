@@ -151,7 +151,11 @@
 				this.queryIntegralTypeByPage({pageSize:this.pageSize,pageNumber:page})
 			},
 			handleClose(done){
-				done()
+				this.$confirm('确认关闭？')
+					.then(_ => {
+						done();
+					})
+					.catch(_ => {});
 			},
 			onHandleAdd(){
 				this.isEdit=false

@@ -2,13 +2,18 @@
 	<div class="sider">
 		 <el-menu
 		  ref="menu"
-			default-active="2"
+			:default-active="active"
 			class="el-menu-vertical-demo"
 			@open="handleOpen"
 			router
 			unique-opened
 			@select="handleChooseMenu"
 			@close="handleClose">
+				<el-menu-item :index="'/home'" style="margin-left: 8px;">
+					<img src="../assets/images/home.png" style="height: 18px;width: 18px;">
+					<span slot="title" class="ml-2">首页</span>
+				</el-menu-item>
+				
 				<el-submenu 
 					:index="item.menuUrl" 
 					v-for="(item,index) in menu" 
@@ -37,28 +42,29 @@ import api from '../api/api.js'
 export default {
 	data(){
 		return {
-			menu:[]
+			menu:[],
+			active:''
 		}
 	},
 	methods: {
 		handleChooseMenu(index,path){
-			// console.log(this.$route.matched);
-			// try{
-			// 	this.$router.push(index)
-			// }catch{
-			// 	this.$router.push('/test')
-			// }
+			// // console.log(index,path);
+			localStorage.setItem('active',JSON.stringify({active:index}))
+
 		},
 		handleOpen(key, keyPath) {
-			// console.log(key, keyPath);
+			// // console.log(key, keyPath);
 		},
 		handleClose(key, keyPath) {
-			// console.log(key, keyPath);
+			// // console.log(key, keyPath);
 		}
 	},
 	created() {
+		let a=localStorage.getItem('active')
+		this.active=a?JSON.parse(a).active:''
+		this.$router.push(this.active)
 		api.loadUserMenuAPI().then(res=>{
-			// console.log('当前用户菜单',res);
+			// // console.log('当前用户菜单',res);
 			if(res.code==0){
 				this.menu=res.data
 			}else{

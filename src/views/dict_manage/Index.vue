@@ -405,7 +405,13 @@
 				this.currentDictBig=row
 				this.dialogVisibleBig=true
 			},
-			handleClose(done){done()},
+			handleClose(done){
+				this.$confirm('确认关闭？')
+					.then(_ => {
+						done();
+					})
+					.catch(_ => {});
+			},
 			handleAddBigClass(){
 				this.currentDictBig=null
 				this.dialogVisibleBig=true
@@ -426,13 +432,13 @@
 				}
 			},
 			onBaseTabClick(val){
-				// console.log(val);
+				// // console.log(val);
 				this.type=parseInt(val)
 			},
 			querySysDictionaryCategoryByPage(params){
 				api.querySysDictionaryCategoryByPageAPI(params).then(res=>{
 					if(res.code==0){
-						// console.log('字典大',res);
+						// // console.log('字典大',res);
 						this.bigDictList=res.data.records
 						this.total=res.data.total
 					}
@@ -441,7 +447,7 @@
 			querySysDictionaryByPage(params){
 				api.querySysDictionaryByPageAPI(params).then(res=>{
 					if(res.code==0){
-						// console.log('字典小',res);
+						// // console.log('字典小',res);
 						this.smallDictList=res.data.records
 						this.totalS=res.data.total
 					}

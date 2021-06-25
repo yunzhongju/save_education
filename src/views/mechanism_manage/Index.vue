@@ -2,7 +2,7 @@
 	<div class="in-animate">
 		<base-tabs @onBaseTabClick="onBaseTabClick" :baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
+				<div>
 					<el-row>
 						<el-col :span="12">
 							<div class="grid-content bg-purple-light">
@@ -28,12 +28,14 @@
 					</el-row>
 					<el-row class="marg-top20" :gutter="10">
 					  <el-col :span="5"><div class="grid-content bg-purple ">
-						<el-card class="box-card">
+						<el-card class="card">
 							<el-tree 
 								:data="orgList" 
 								node-key="orgCode"
 								:props="defaultProps" 
 								accordion
+								draggable
+								@node-drop="nodeDrop"
 								:default-expanded-keys="['ZGS']"
 								@node-click="handleNodeClick">
 								<div class="showname" slot-scope="{ node, data }">
@@ -41,7 +43,7 @@
 										class="item" 
 										effect="light" 
 										:visible-arrow="false"
-										:content="node.label" placement="top">
+										:content="node.label" placement="right">
 											<span >
 												<img 
 													src="../../assets/images/org.png" 
@@ -53,14 +55,14 @@
 						</el-card>
 						</div></el-col>
 					  <el-col :span="19"><div class="grid-content bg-purple-light">
-							<el-card class="box-card">
+							<el-card class="card">
 							  <el-tabs v-model="activeName" @tab-click="handleClick">
 							      <el-tab-pane label="基本信息" name="0">
 							  			<base-detail :detail="orgDeatil" @onHandleUpdate="onHandleUpdate"></base-detail>
 							  		</el-tab-pane>
-							      <el-tab-pane label="下级机构" name="1">
+							      <el-tab-pane :label="'下级机构('+orgTotal+')'" name="1">
 											<base-table
-											:total="total" 
+											:total="orgTotal" 
 											@getPageSize="getPageSizeOrg" 
 											@getCurrentPage="getCurrentPageOrg">
 											<el-table
@@ -109,41 +111,32 @@
 													align="center"
 													>
 												</el-table-column>
-												<el-table-column
-													prop=""
-													label="机构类型"
-													align="center"
-													>
-													<template slot-scope="scope">
-														<span>{{scope.row.orgType==0?'机构':'小组'}}</span>
-													</template>
-												</el-table-column>
 													<el-table-column label="操作" align="center">
-													<template slot-scope="scope">
-														<el-button
-															size="mini"
-															type="text"
-															@click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-														<el-button
-															size="mini"
-															type="text"
-															@click="handleDelete(scope.$index, scope.row)">删除</el-button>
-														<el-button
-															size="mini"
-															v-show="scope.row.status==1"
-															type="text"
-															@click="handleOrgStop(scope.$index, scope.row)">停用</el-button>
-														<el-button
-															size="mini"
-															type="text"
-															v-show="scope.row.status==0"
-															@click="handleOrgStart(scope.$index, scope.row)">启用</el-button>
-													</template>
+														<template slot-scope="scope">
+															<el-button
+																size="mini"
+																type="text"
+																@click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+															<el-button
+																size="mini"
+																type="text"
+																@click="handleDelete(scope.$index, scope.row)">删除</el-button>
+															<el-button
+																size="mini"
+																v-show="scope.row.status==1"
+																type="text"
+																@click="handleOrgStop(scope.$index, scope.row)">停用</el-button>
+															<el-button
+																size="mini"
+																type="text"
+																v-show="scope.row.status==0"
+																@click="handleOrgStart(scope.$index, scope.row)">启用</el-button>
+														</template>
 													</el-table-column>
 												</el-table>
 											</base-table>
 										</el-tab-pane>
-							      <el-tab-pane label="下级小组" name="2">
+							      <el-tab-pane :label="'下级小组('+groupTotal+')'" name="2">
 											<base-table
 											:total="groupTotal" 
 											@getPageSize="getPageSizeGroup" 
@@ -166,14 +159,14 @@
 														</template>
 													</el-table-column>
 													<el-table-column
-														label="机构编码"
+														label="小组编码"
 														prop="orgCode"
 														align="center"
 														>
 													</el-table-column>
 													<el-table-column
 														prop="orgName"
-														label="机构名称"
+														label="小组名称"
 														align="center"
 														>
 													</el-table-column>
@@ -195,16 +188,7 @@
 														align="center"
 														>
 													</el-table-column>
-													<el-table-column
-														prop=""
-														label="机构类型"
-														align="center"
-														>
-														<template slot-scope="scope">
-															<span>{{scope.row.orgType==0?'机构':'小组'}}</span>
-														</template>
-													</el-table-column>
-														<el-table-column label="操作" align="center">
+													<el-table-column label="操作" align="center">
 														<template slot-scope="scope">
 															<el-button
 																size="mini"
@@ -223,11 +207,11 @@
 																type="text"
 																@click="handleAddGroupUser(scope.$index, scope.row)">添加</el-button>
 														</template>
-														</el-table-column>
-													</el-table>
+													</el-table-column>
+												</el-table>
 											</base-table>
 										</el-tab-pane>
-							      <el-tab-pane label="所属成员" name="3">
+							      <el-tab-pane :label="'所属成员('+userTotal+')'" name="3">
 											<base-table
 											:total="userTotal" 
 											@getPageSize="getPageSizeUser" 
@@ -256,7 +240,9 @@
 														>
 														<template slot-scope="scope">
 															<div class="block">
-																<el-avatar size="large" :src="scope.row.avatar">
+																<el-avatar 
+																	icon="el-icon-user-solid"
+																	:src="scope.row.avatar">
 																</el-avatar>
 															</div>
 														</template>
@@ -282,17 +268,11 @@
 														>
 													</el-table-column>
 													<el-table-column
-														prop="birth"
-														label="出生日期"
-														align="center"
-														>
-													</el-table-column>
-													<el-table-column
 														label="角色"
 														align="center"
 														>
 														<template slot-scope="scope">
-															<span>{{scope.row.loginAuthor==0?'管理员':scope.row.loginAuthor==1?'学员':'讲师'}}</span>
+															<span>{{scope.row.loginAuthor==1?'管理员':scope.row.loginAuthor==0?'学员':'讲师'}}</span>
 														</template>
 													</el-table-column>
 												</el-table>
@@ -310,10 +290,12 @@
 		  title="添加成员"
 			center
 			width="45%"
+			v-if="dialogVisibleAdd"
 		  :visible.sync="dialogVisibleAdd"
 		  :before-close="handleClose">
 		  <div style="margin: 0 auto; width: 100%;">
-				<base-transfer @getUserList="getUserList"></base-transfer>
+				<!-- <base-transfer @getUserList="getUserList"></base-transfer> -->
+				<SelectUser @getUserCodes="getUserList"></SelectUser>
 			</div>
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="dialogVisibleAdd = false">取 消</el-button>
@@ -324,7 +306,6 @@
 		<el-dialog
 		  title="成员"
 			center
-			width="70%"
 		  :visible.sync="dialogVisibleUser"
 		  :before-close="handleClose">
 		  <div style="margin: 0 auto; width: 100%;">
@@ -342,24 +323,29 @@
 
 <script>
 import UserList from './components/UserList.vue'
+import SelectUser from '../../components/SelectUser.vue'
 import BaseTabs from '../../components/BaseTabs.vue';
 import BaseTable from '../../components/BaseTable.vue';
 import BaseDetail from './components/BaseDetail.vue'
 import BaseTransfer from '../../components/BaseTransfer.vue'
 import api from '../../api/api.js'
+import {mapState} from 'vuex'
 export default {
-	inject:['reloadAll'],
+	inject:['reloadAll','app'],
 	components: {
 		BaseTabs,
 		BaseTable,
 		BaseDetail,
 		BaseTransfer,
-		UserList
+		UserList,
+		SelectUser
 	},
 	data() {
 		return {
 			groupTotal:0,
 			userTotal:0,
+			downOrgPage:1,
+			downGroupPage:1,
 			currentGroup:null,
 			dialogVisibleAdd:false,
 			dialogVisibleUser:false,
@@ -371,6 +357,7 @@ export default {
 			orgList:[],
 			groupList:[],
 			secendList:[],
+			orgTotal:0,
 			activeName:"0",
 			currentOrg:null,
 			orgDeatil:null,
@@ -385,7 +372,21 @@ export default {
 			pageSize:10
 		};
 	},
+	computed:{
+		...mapState({
+			user:s=>s.userInfo
+		}),
+		orgCode(){
+			return this.user.projectDepartment==='admin'?'ZGS':this.user.projectDepartment
+		}
+	},
 	methods: {
+		nodeDrop(befor,after,inner,e){
+			// console.log(befor);
+			// console.log(after);
+			// console.log(inner);
+			// console.log(e);
+		},
 		onHandleUpdate(){
 			this.$router.push({
 				path:'/menu/mechanismCreate',
@@ -395,22 +396,24 @@ export default {
 			})
 		},
 		getPageSizeUser(val){
-			this.querySysUserByPage({pageNo:1,pageSize:val,orgCode:node.orgCode,orgType:0})
+			this.querySysUserByPage({pageNo:1,pageSize:val,orgCode:this.currentOrg.orgCode,orgType:0})
 		},
 		getCurrentPageUser(val){
-			this.querySysUserByPage({pageNo:val,pageSize:val,orgCode:node.orgCode,orgType:0})
+			this.querySysUserByPage({pageNo:val,pageSize:10,orgCode:this.currentOrg.orgCode,orgType:0})
 		},
 		getPageSizeOrg(val){
 			this.querySysOrgByPage({pageNo:1,pageSize:val,parentCode:this.currentOrg.orgCode,orgType:0})
 		},
 		getCurrentPageOrg(val){
-			this.querySysOrgByPage({pageNo:val,pageSize:this.pageSize,parentCode:this.currentOrg.orgCode,orgType:0})
+			this.downOrgPage=val
+			this.querySysOrgByPage({pageNo:this.downOrgPage,pageSize:this.pageSize,parentCode:this.currentOrg.orgCode,orgType:0})
 		},
 		getPageSizeGroup(val){
 			this.querySysOrgByPage({pageNo:1,pageSize:val,parentCode:this.currentOrg.orgCode,orgType:1})
 		},
 		getCurrentPageGroup(val){
-			this.querySysOrgByPage({pageNo:val,pageSize:this.pageSize,parentCode:this.currentOrg.orgCode,orgType:1})
+			this.downGroupPage=val
+			this.querySysOrgByPage({pageNo:this.downGroupPage,pageSize:this.pageSize,parentCode:this.currentOrg.orgCode,orgType:1})
 		},
 		handleUserRemove(row){
 			this.$confirm('此操作将移除该成员, 是否继续?', '提示', {
@@ -425,7 +428,9 @@ export default {
 							type: 'success',
 							message: '移除成功!'
 						});
-						this.querySysUserByPage({pageNo:1,pageSize:10,orgCode:row.groupCode,orgType:1})
+						// this.getGourpUser({pageNo:1,pageSize:10,orgCode:row.orgCode,orgType:1})
+						let i =this.groupList.findIndex(v=>v.id===row.id)
+						this.groupList.splice(i,1)
 					}else{
 						this.$message({
 							type: 'warning',
@@ -448,7 +453,7 @@ export default {
 						type: 'success',
 						message: '设置成功!'
 					});
-					this.querySysUserByPage({pageNo:1,pageSize:10,orgCode:row.groupCode,orgType:1})
+					// this.getGourpUser({pageNo:1,pageSize:10,orgCode:row.orgCode,orgType:1})
 				}else{
 					this.$message({
 						type: 'warning',
@@ -464,7 +469,7 @@ export default {
 						type: 'success',
 						message: '设置成功!'
 					});
-					this.querySysUserByPage({pageNo:1,pageSize:10,orgCode:row.groupCode,orgType:1})
+					// this.querySysUserByPage({pageNo:1,pageSize:10,orgCode:row.groupCode,orgType:1})
 				}else{
 					this.$message({
 						type: 'warning',
@@ -492,14 +497,36 @@ export default {
 		getUserList(arr){
 			this.addUserList=arr
 		},
-		handleClose(done){done()},
+		handleClose(done){
+			this.$confirm('确认关闭？')
+				.then(_ => {
+					done();
+				})
+				.catch(_ => {});
+		},
 		handleAddGroupUser(index,row){
-			this.currentGroup=row
-			this.dialogVisibleAdd=true
+			this.app.show(res=>{
+				// console.log(res);
+				if(res.length!==0){
+					api.addUserToGroupAPI({groupCode:row.orgCode,userList:res.map(v=>v.userCode)}).then(res=>{
+						this.$message({
+							type: 'success',
+							message: '添加成功!'
+						});
+					})
+				}
+			})
+			// // console.log(row);
+			// this.currentGroup=row
+			// api.querySysUserByPageAPI({pageNo:1,pageSize:100,orgCode:row.orgCode,orgType:1}).then(res=>{
+			// 	this.groupUser=res.data.records
+			// 	this.$store.commit('setUsers',res.data.records)
+			// 	this.dialogVisibleAdd=true
+			// })
 		},
 		handleGroupUser(index,row){
 			this.currentGroup=row
-			this.querySysUserByPage({pageNo:1,pageSize:10,orgCode:row.orgCode,orgType:1})
+			this.getGourpUser({pageNo:1,pageSize:30,orgCode:row.orgCode,orgType:1})
 			this.dialogVisibleUser=true
 		},
 		handleDeleteGroup(index,row){
@@ -515,7 +542,7 @@ export default {
 								type: 'success',
 								message: '解散成功!'
 							});
-							this.reloadAll()
+							this.querySysOrgByPage({pageNo:this.downGroupPage,pageSize:this.pageSize,parentCode:this.currentOrg.orgCode,orgType:1})
 						}
 					})
 				})
@@ -533,7 +560,7 @@ export default {
 						type: 'success',
 						message: '启用成功!'
 					});
-					this.reloadAll()
+					this.querySysOrgByPage({pageNo:this.downOrgPage,pageSize:this.pageSize,parentCode:this.currentOrg.orgCode,orgType:0})
 				}
 			})
 		},
@@ -550,7 +577,7 @@ export default {
 								type: 'success',
 								message: '停用成功!'
 							});
-							this.reloadAll()
+							this.querySysOrgByPage({pageNo:this.downOrgPage,pageSize:this.pageSize,parentCode:this.currentOrg.orgCode,orgType:0})
 						}
 					})
 				})
@@ -617,17 +644,17 @@ export default {
 			})
 		},
 		handleClick(node){
-			if(!this.currentOrg){
-				this.$message({
-					message:'请选择机构',
-					type:'warning'
-				})
-				return false
-			}
+			// if(!this.currentOrg){
+			// 	this.$message({
+			// 		message:'请选择机构',
+			// 		type:'warning'
+			// 	})
+			// 	return false
+			// }
 			if(node.index==0){
 				api.querySysOrgDetailAPI({orgCode:this.currentOrg.orgCode}).then(res=>{
 					if(res.code==0){
-						// console.log('详情',res);
+						// // console.log('详情',res);
 						this.orgDeatil=res.data
 					}
 				})
@@ -643,16 +670,20 @@ export default {
 			// console.log(node);
 			this.currentOrg=node
 			this.secendList=node.childrenOrg
-			api.querySysOrgDetailAPI({orgCode:node.orgCode}).then(res=>{
-				if(res.code==0){
-					// console.log('详情',res);
-					this.orgDeatil=res.data
-				}
-			})
+			// api.querySysOrgDetailAPI({orgCode:node.orgCode}).then(res=>{
+			// 	if(res.code==0){
+			// 		// // console.log('详情',res);
+			// 		this.orgDeatil=res.data
+			// 	}
+			// })
+			api.querySysOrgDetailAPI({orgCode:node.orgCode}).then(res=>{this.orgDeatil=res.data})
+			this.querySysOrgByPage({pageNo:1,pageSize:this.pageSize,parentCode:node.orgCode,orgType:0})
+			this.querySysOrgByPage({pageNo:1,pageSize:this.pageSize,parentCode:node.orgCode,orgType:1})
+			this.querySysUserByPage({pageNo:1,pageSize:this.pageSize,orgCode:node.orgCode,orgType:0})
 		},
 		//切换baseTabs
 		onBaseTabClick(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//编辑
 		handleEdit(index, row) {
@@ -677,7 +708,7 @@ export default {
 								type: 'success',
 								message: '删除成功!'
 							});
-							this.secendList=this.secendList.filter(item=>{item.orgCode!=row.orgCode})
+							this.querySysOrgByPage({pageNo:this.downOrgPage,pageSize:this.pageSize,parentCode:this.currentOrg.orgCode,orgType:0})
 							this.getSysOrgTree()
 						}
 					})
@@ -689,26 +720,19 @@ export default {
 					});
 				});
 		},
-		//获取当前页
-		getCurrentPage(val) {
-			// console.log(val);
-		},
-		//获取pagesize
-		getPageSize(val) {
-			// console.log(val);
-		},
 		getSysOrgTree(){
-			api.getSysOrgTreeAPI().then(res=>{
-				// console.log('tree',res);
+			api.getSysOrgTreeAPI({orgCode:this.user.projectDepartment}).then(res=>{
+				// // console.log('tree',res);
 				if(res.code==0){
 					this.orgList=res.data
+					this.currentOrg=res.data[0]
 				}
 			})
 		},
 		querySysOrgByPage(params){
 			api.querySysOrgByPageAPI(params).then(res=>{
 				if(res.code==0){
-					// console.log('机构列表',res);
+					// // console.log('机构列表',res);
 					if(params.orgType==0){
 						this.secendList=res.data.records
 						this.orgTotal=res.data.total
@@ -719,8 +743,14 @@ export default {
 				}
 			})
 		},
+		getGourpUser(p){
+			api.querySysUserByPageGroupAPI(p).then(res=>{
+				this.groupUser=res.data.records
+				this.groupUserTotal=res.data.total
+			})
+		},
 		querySysUserByPage(params){
-			api.querySysUserByPageAPI(params).then(res=>{
+			api.querySysUserByOrgCodeAPI(params).then(res=>{
 				// console.log('用户列表',res.data);
 				if(params.orgType==0){
 					this.userList=res.data.records
@@ -734,20 +764,25 @@ export default {
 	},
 	created() {
 		this.getSysOrgTree()
+		api.querySysOrgDetailAPI({orgCode:this.orgCode}).then(res=>{this.orgDeatil=res.data})
+		this.querySysOrgByPage({pageNo:1,pageSize:this.pageSize,parentCode:this.orgCode,orgType:0})
+		this.querySysOrgByPage({pageNo:1,pageSize:this.pageSize,parentCode:this.orgCode,orgType:1})
+		this.querySysUserByPage({pageNo:1,pageSize:this.pageSize,orgCode:this.orgCode,orgType:0})
 	}
 };
 </script>
 
 <style scoped>
-	.box-card{
-		height: 693px;
-		overflow-y: auto;
+	.card{
+		height: 700px;
+		overflow: auto;
 	}
 .showname{
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	display: block;
+	/* margin-top: 10px; */
 }
 
 </style>

@@ -4,7 +4,7 @@
 		@onBaseTabClick="onBaseTabClick"
 		:baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
+				<div class="">
 					<el-row>
 					  <el-col :span="24"><div class="grid-content bg-purple-dark flex-end">
 							<el-button
@@ -104,6 +104,7 @@
 					:isAdd="isAdd"
 					@submit="submit"
 					@update="update"
+					@resetForm="resetForm"
 					:parentSectionCode="currentSection?currentSection.sectionCode:null"
 					:parentSectionName="currentSection?currentSection.sectionName:null"
 					:currentCourse="currentCourse"
@@ -162,8 +163,11 @@
 			}
 		},
 		methods:{
+			resetForm(){
+				this.dialogVisible=false
+			},
 			handleDetailSection(index,row){
-				// console.log(row);
+				// // console.log(row);
 				this.sectionUrl=row.sectionUrl
 				this.dialogVisibleDetail=true
 			},
@@ -173,7 +177,7 @@
 				this.dialogVisible=true
 			},
 			handleDeleteSection(index,row){
-				// console.log(row)
+				// // console.log(row)
 				this.$confirm('此操作将删除该章节, 是否继续?', '提示', {
 					confirmButtonText: '确定',
 					cancelButtonText: '取消',
@@ -213,12 +217,18 @@
 				this.currentSection=row
 				this.dialogVisible=true
 			},
-			handleClose(done){done()},
+			handleClose(done){
+				this.$confirm('确认关闭？')
+					.then(_ => {
+						done();
+					})
+					.catch(_ => {});
+			},
 			onBaseTabClick(){},
 			queryCourseSectionTree(params){
 				this.loading=true
 				api.queryCourseSectionTreeAPI(params).then(res=>{
-					// console.log('章节列表',res);
+					// // console.log('章节列表',res);
 					if(res.code==0){
 						this.courseSectionList=res.data
 						this.loading=false

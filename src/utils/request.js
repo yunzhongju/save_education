@@ -5,12 +5,13 @@ import {
 import router from '../router'
 
 // 默认超时设置
-axios.defaults.timeout = 10000;
+axios.defaults.timeout = 50000;
 
 
 if(process.env.NODE_ENV==='development'){
 	// 相对路径设置
-	axios.defaults.baseURL = '/api';
+	axios.defaults.baseURL = '/test';
+	// axios.defaults.baseURL = '/api';
 }else{
 	// alert("生产环境");
 	axios.defaults.baseURL = '/api';
@@ -37,7 +38,7 @@ export default function post(url, data, type = 0) {
 				'token': token,
 			}
 		}).then(res => {
-				// console.log('post', res);
+				// // console.log('post', res);
 				if(res.data.code==401){
 					localStorage.removeItem('user_info')
 					router.push('/login')
@@ -51,12 +52,12 @@ export default function post(url, data, type = 0) {
 						message: res.data.msg
 					})
 				}
-				if (res.status == 200) {
+				if (res.data.code == 0) {
 					resolve(res.data)
 				} else {
 					Message({
 						type: 'error',
-						message: '请求失败'
+						message: res.data.msg
 					})
 				}
 			},

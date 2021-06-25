@@ -62,7 +62,7 @@
 				this.form.imagePath=url
 			},
 			handleChoose(index,row){
-				// console.log(index,row);
+				// // console.log(index,row);
 				this.form.link=row.title
 			},
       onSubmit(formName) {
@@ -107,7 +107,7 @@
 							})
 						}
 					} else {
-						console.log('error submit!!');
+						// console.log('error submit!!');
 						return false;
 					}
 				});
@@ -120,7 +120,7 @@
 			getCurrentPage(val){},
 			handleSelectionChange(){},
 			handleEdit(index,row){
-				// console.log(index,row);
+				// // console.log(index,row);
 			},
 			
     },

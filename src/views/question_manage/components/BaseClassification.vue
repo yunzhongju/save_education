@@ -8,6 +8,8 @@
 					v-model="value" 
 					placeholder="请选择课程" 
 					@change="handleCourseType"
+					filterable 
+					default-first-option
 					style="width: 90%;" 
 					clearable
 					size="mini">
@@ -27,7 +29,7 @@
 				  :props="defaultProps"
 				  accordion
 				  @node-click="handleNodeClick">
-					<div slot-scope="{ node, data }">
+					<div class="custom-tree-node" slot-scope="{ node, data }">
 						<el-tooltip class="item" effect="light" :content="node.label" placement="top">
 							<span>{{node.label}}</span>
 						</el-tooltip>
@@ -59,7 +61,9 @@
     },
     methods: {
 			handleCourseType(val){
-				this.queryCourseSectionTree({courseCode:val})
+				if(val){
+					this.queryCourseSectionTree({courseCode:val})
+				}
 			},
       handleNodeClick(data) {
 				this.$emit('getNode',data)
@@ -70,7 +74,13 @@
 			handleUpdate(){
 				this.dialogVisible=true
 			},
-			handleClose(done){done()},
+			handleClose(done){
+				this.$confirm('确认关闭？')
+					.then(_ => {
+						done();
+					})
+					.catch(_ => {});
+			},
 			handleDelete(){
 				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
 					confirmButtonText: '确定',
@@ -90,15 +100,17 @@
 			},
 			queryCourseByPage(params){
 				api.queryCourseByPageAPI(params).then(res=>{
-					// console.log('课程列表',res);
+					// // console.log('课程列表',res);
 					if(res.code==0){
 						this.courseList=res.data.records
+						this.value=res.data.records[0].courseCode
+						this.queryCourseSectionTree({courseCode:this.value})
 					}
 				})
 			},
 			queryCourseSectionTree(params){
 				api.queryCourseSectionTreeAPI(params).then(res=>{
-					// console.log('章节列表',res);
+					// // console.log('章节列表',res);
 					if(res.code==0){
 						this.courseSectionTree=res.data
 					}
@@ -122,5 +134,15 @@
 	.over-x{
 		overflow-x: auto;
 		height: 565px;
+	}
+	.custom-tree-node{
+		display: flex;
+		span{
+			width: 200px;
+			overflow: hidden;
+			align-items: center;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
 	}
 </style>

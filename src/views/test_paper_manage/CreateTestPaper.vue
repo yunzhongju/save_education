@@ -4,8 +4,8 @@
 		@onBaseTabClick="onBaseTabClick"
 		:baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="flex-mid2 container">
-					<base-form 
+				<div class="d-flex w-100">
+					<base-form
 						@handleChoose="handleChoose"
 						class="b-form"></base-form>
 				</div>
@@ -15,9 +15,9 @@
 </template>
 
 <script>
-	import BaseTabs from '../../components/BaseTabs.vue';
+	import BaseTabs from '@/components/BaseTabs.vue';
 	import BaseForm from './components/BaseForm.vue'
-	import api from '../../api/api.js'
+	import api from '@/api/api.js'
 	export default {
 		components:{
 			BaseTabs,
@@ -39,7 +39,7 @@
 			},
 			queryQuestionByPage(params){
 				api.queryQuestionByPageAPI(params).then(res=>{
-					// console.log(res);
+					// // console.log(res);
 					if(res.code==0){
 						this.questionList=res.data.records,
 						this.total=res.data.total
@@ -48,7 +48,7 @@
 			}
 		},
 		created() {
-			this.queryQuestionByPage({pageNo:1,pageSize:10})
+			// this.queryQuestionByPage({pageNo:1,pageSize:10})
 		}
 	}
 </script>

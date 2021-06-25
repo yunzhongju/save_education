@@ -31,13 +31,22 @@
 					</el-option>
 				</el-select>
 			</el-form-item>
-			<el-form-item label="人员选择" prop="userCodes">
-			  <base-transfer
-				:leftList="form.userCodes"
-				 @handleChooseDepartment="handleChooseDepartment"
-				 @getUserList="getUserList">
-				</base-transfer>
-			</el-form-item>
+<!-- 			<el-form-item label="人员选择" prop="userCodes">
+				<div
+					class="border p-2 rounded" 
+					style="max-height: 200px;overflow: auto;width: 740px;" 
+					v-if="form.userCodes.length!==0">
+					<el-tag 
+						v-for="(item,index) in form.userCodes" 
+						closable
+						@close="handleRemoveUser(item,index)"
+						class="mr-2">{{item.userName}}</el-tag>
+				</div>
+				<span 
+					@click="handleChooseUser" 
+					class="btn btn-light border py-2 px-3 mt-2" 
+					style="font-size: 26px;">+</span>
+			</el-form-item> -->
 		  <el-form-item>
 		    <el-button type="primary" @click="onSubmit('form')">{{form.id?'更新':'创建'}}</el-button>
 		    <el-button @click="resetForm('form')">取消</el-button>
@@ -48,12 +57,24 @@
 
 <script>
 	import BaseTransfer from '../../../components/BaseTransfer.vue'
+	import SelectUser from '../../../components/SelectUser.vue'
 	import BaseTable from '../../../components/BaseTable.vue'
 	import api from '../../../api/api.js'
+	import {mapState} from 'vuex'
   export default {
+		computed:{
+			...mapState({
+				user:s=>s.userInfo
+			}),
+		orgCode(){
+			return this.user.projectDepartment==='admin'?'ZGS':this.user.projectDepartment
+		}
+		},
+		inject:['app'],
 		components:{
 			BaseTable,
-			BaseTransfer
+			BaseTransfer,
+			SelectUser
 		},
 		props:{
 			id:Number
@@ -63,12 +84,7 @@
 				orgList:[],
 				ruleList:[],
 				value:'',
-				userData:[{
-					id:1,
-					name:'tom',
-					phone:12381923213,
-					department: '中情局',
-				}],
+				userData:[],
 				isable:0,
         form: {
 					id:null,
@@ -88,8 +104,17 @@
       }
     },
     methods: {
+			handleRemoveUser(item,index){
+				this.form.userCodes.splice(index,1)
+			},
+			handleChooseUser(){
+				this.app.show(res=>{
+					// console.log(res);
+					this.form.userCodes=Array.from(new Set([...this.form.userCodes,...res]))
+				})
+			},
 			handleChooseOrg(node){
-				// console.log(node);
+				// // console.log(node);
 				this.form.orgCode=node[node.length-1]
 			},
       onSubmit(formName) {
@@ -100,7 +125,7 @@
 							groupName:this.form.groupName,
 							remarks:this.form.remarks,
 							orgCode:this.form.orgCode,
-							userCodes:this.form.userCodes,
+							userCodes:this.form.userCodes.map(v=>v.userCode),
 							attendanceRule:this.form.attendanceRule,
 						}
 						if(!this.form.id){
@@ -125,7 +150,7 @@
 							})
 						}
 					} else {
-						console.log('error submit!!');
+						// console.log('error submit!!');
 						return false;
 					}
 				});
@@ -142,13 +167,13 @@
 				this.form.addr=val.lnglat.lng+' | '+val.lnglat.lat
 			},
 			handleChooseDepartment(val){
-				// console.log(val);
+				// // console.log(val);
 			},
 			handleChooseRule(val){},
 			getCurrentPage(val){},
 			handleSelectionChange(){},
 			handleEdit(index,row){
-				// console.log(index,row);
+				// // console.log(index,row);
 				this.form.exam=row.name
 			},
 			handleUserList(arr){
@@ -161,9 +186,9 @@
 				return list
 			},
 			getSysOrgTree(){
-				api.getSysOrgTreeAPI().then(res=>{
+				api.getSysOrgTreeAPI({orgCode:this.orgCode}).then(res=>{
 					if(res.code==0){
-						// console.log('机构列表',res);
+						// // console.log('机构列表',res);
 						this.orgList=res.data
 					}
 				})
@@ -173,7 +198,7 @@
 			this.getSysOrgTree()
 			api.attendanceRuleQueryListAPI({}).then(res=>{
 				if(res.code==0){
-					// console.log(res);
+					// // console.log(res);
 					this.ruleList=res.data
 				}
 			})
@@ -185,7 +210,7 @@
 						this.form.groupName=res.data.groupName
 						this.form.remarks=res.data.remarks
 						this.form.orgCode=res.data.orgCode
-						this.form.userCodes=[...this.handleUserList(res.data.userList)]
+						this.form.userCodes=res.data.userList
 						this.form.attendanceRule=res.data.attendanceRule
 					}
 				})

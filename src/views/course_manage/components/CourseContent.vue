@@ -83,20 +83,26 @@
     },
 
     methods: {
-			handleClose(done){done()},
+			handleClose(done){
+				this.$confirm('确认关闭？')
+					.then(_ => {
+						done();
+					})
+					.catch(_ => {});
+			},
 			addChapter(){
 				this.dialogVisible=true
 			},
       append(data) {
-        // console.log(data);
+        // // console.log(data);
 				this.dialogVisible=true
       },
 			update(data) {
-			  // console.log(data);
+			  // // console.log(data);
 				this.dialogVisible=true
 			},
       remove(node, data) {
-        // console.log(data,node);
+        // // console.log(data,node);
 				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
 					confirmButtonText: '确定',
 					cancelButtonText: '取消',

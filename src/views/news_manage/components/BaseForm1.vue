@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="m-auto">
 		<el-form ref="form" :model="form" :rules="rulesForm" label-width="100px">
 			<el-form-item label="资讯封面" prop="imagePath">
 				<upload-img 
@@ -10,6 +10,7 @@
 		    <el-input type="text" v-model="form.title"></el-input>
 		  </el-form-item>
 			<el-form-item label="栏目" prop="channelId">
+				
 			  <el-input type="text" v-model="form.channelName" placeholder=""></el-input>
 			  <div>
 			  	<el-tree :data="channelList" :props="defaultProps" @node-click="handleNodeClick"></el-tree>
@@ -57,7 +58,7 @@
           content: '',
           source: '',
           imagePath: '',
-					vmReadNumber:'',
+					vmReadNumber:0,
 					channelId:'',
 					channelName:'',
         },
@@ -94,7 +95,7 @@
 							vmReadNumber:this.form.vmReadNumber,
 							channelId:this.form.channelId,
 						}
-						// console.log(params);
+						// // console.log(params);
 						if(!this.form.id){
 							api.newsAddAPI(params).then(res=>{
 								if(res.code==0){
@@ -128,7 +129,7 @@
 						}
 						
 					} else {
-						// console.log('error submit!!');
+						// // console.log('error submit!!');
 						return false;
 					}
 				});
@@ -141,11 +142,11 @@
 			getCurrentPage(val){},
 			handleSelectionChange(){},
 			handleEdit(index,row){
-				// console.log(index,row);
+				// // console.log(index,row);
 				this.form.exam=row.name
 			},
 			handleNodeClick(data) {
-				// console.log(data);
+				// // console.log(data);
 				this.form.channelName=data.channelName
 				this.form.channelId=data.id
 			},
@@ -163,7 +164,7 @@
 			if(this.form.id){
 				api.newsDetailAPI({id:this.form.id}).then(res=>{
 					if(res.code==0){
-						// console.log('news详情',res);
+						// // console.log('news详情',res);
 						this.detail=res.data
 						this.form.title=res.data.title
 						this.form.channelId=res.data.channelId

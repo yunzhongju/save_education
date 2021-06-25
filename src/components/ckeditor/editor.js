@@ -15,7 +15,7 @@ export default class UploadImageAdapter {
 				params: {},
 				mimeType: ["image/png", "image/jpeg"]
 			},
-			imgURL: "http://education.quweiquwei.com" //这个是自己服务器的域名
+			imgURL: "https://education.quweiquwei.com" //这个是自己服务器的域名
 		}
 	}
 	getQiniuToken() {
@@ -24,9 +24,9 @@ export default class UploadImageAdapter {
 				url: `/getSimpleUpToken.do`,
 				method: "post",
 			}).then(res => {
-				// console.log('ckeditor',res);
+				// // console.log('ckeditor',res);
 				if (res.status == 200) {
-					// console.log('编辑器请求的token',res);
+					// // console.log('编辑器请求的token',res);
 					resolve(res.data.data)
 				}
 			});
@@ -64,7 +64,7 @@ export default class UploadImageAdapter {
 					// vm.$Message('上传失败！');
 				},
 				complete(res) {
-					let url =`${img_path}/${res.key}?imageView2/0/format/jpg/q/15|imageslim`;
+					let url =`${img_path}/${res.key}?imageView2/0/format/jpg`;
 					let response = {
 						default: url
 					}

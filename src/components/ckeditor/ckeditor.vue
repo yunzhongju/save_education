@@ -134,7 +134,7 @@ export default {
 							.then(f => {
 								const F = new FileReader();
 								F.readAsArrayBuffer(f);
-								console.log(f);
+								// console.log(f);
 								return new Promise(resolve => {
 									F.onload = function() {
 										resolve({ bufAsArray: F.result, file: f });

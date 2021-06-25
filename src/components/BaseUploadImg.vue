@@ -23,16 +23,10 @@
 				</div>
 			</el-col>
 			<el-col :span="12">
-				<div class="grid-content bg-purple-light showimg" v-if="img_url">
+				<div class="grid-content bg-purple-light showimg" v-show="img_url || url">
 					<img 
-						v-if="!img_url.endsWith('mp4')" 
 						style="height: 180px; width: 360px;" 
-						:src="img_url?img_url:url">
-					<video 
-						:src="img_url" 
-						controls 
-						v-if="img_url.endsWith('mp4')" 
-						style="width: 100%; height: 100%;"></video>
+						:src="img_url || url">
 				</div>
 			</el-col>
 		</el-row>
@@ -50,9 +44,9 @@ export default {
 			type:String,
 			default:()=>''
 		},
-		type:{
+		size:{
 			type:Number,
-			default:()=>0
+			default:()=>5
 		},
 		limit:{
 			type:Number,
@@ -67,7 +61,7 @@ export default {
 				key: '',
 				token: ''
 			},
-			qiniuaddr: 'http://education.quweiquwei.com/',
+			qiniuaddr: 'https://education.quweiquwei.com/',
 			img_url: null
 		};
 	},
@@ -75,25 +69,25 @@ export default {
 
 		handleSuccess(res, file, filelist) {
 			this.img_url = this.qiniuaddr + res.key;
-			console.log('imgurl', this.img_url);
+			// console.log('imgurl', this.img_url);
 			this.$emit('getImgUrl', this.img_url);
 		},
 		beforUpload(file) {
 			let type = file.type
 			let size = file.size/1024/1024
-			// if(type!='image/jpeg'&&type!='image/png'){
-			// 	this.$message({
-			// 		message:'只能上传jpg/png文件',
-			// 		type:'warning'
-			// 	})
-			// 	return false
-			// }else if(size>1){
-			// 	this.$message({
-			// 		message:'上传的图片的大小不能超过1M',
-			// 		type:'warning'
-			// 	})
-			// 	return false
-			// }
+			if(type!='image/jpeg'&&type!='image/png'){
+				this.$message({
+					message:'只能上传jpg/png文件',
+					type:'warning'
+				})
+				return false
+			}else if(size>this.size){
+				this.$message({
+					message:`上传的图片的大小不能超过${this.size}M`,
+					type:'warning'
+				})
+				return false
+			}
 			var timestamp = new Date().getTime();
 			if(type==='image/jpeg'||type==='image/png'){
 				this.qn.key = `${timestamp}/${file.name}`;
@@ -103,7 +97,7 @@ export default {
 		},
 		getSimpleUpToken(){
 			api.getSimpleUpTokenAPI().then(res=>{
-				// console.log('token',res);
+				// // console.log('token',res);
 				if(res.code==0){
 					this.qn.token=res.data
 				}
@@ -112,14 +106,14 @@ export default {
 	},
 	created() {
 		this.getSimpleUpToken()
-		this.img_url=this.url?this.url:''
-		// console.log(1111111,this);
+		// this.img_url=this.url?this.url:''
+		// // console.log(1111111,this);
 	},
 	mounted() {
 		
 	},
 	beforeDestroy() {
-		this.img_url=''
+		// this.img_url=''
 	}
 };
 </script>

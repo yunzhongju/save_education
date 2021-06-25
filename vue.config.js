@@ -24,15 +24,22 @@ module.exports = {
 		"disableHostCheck": true,
 		proxy: {
 			"/api": {
-				target: "http://106.13.201.127:8082/bmcp-web",
-				// target: "http://192.168.0.5:8082/bmcp-web",
-
+				// target: "http://106.13.201.127:8082/bmcp-web",
+				target: "https://jjaq.quweiquwei.com/api/",
 				changeOrigin: true,
 				ws: true,
 				pathRewrite: {
 					"^/api": ''
 				}
 			},
+			"/test":{
+				target: "http://106.13.201.127:8083/bmcp-web/",
+				changeOrigin: true,
+				ws: true,
+				pathRewrite: {
+					"^/test": ''
+				}
+			}
 		}
 	}
 }

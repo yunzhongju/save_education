@@ -4,7 +4,7 @@
 		@onBaseTabClick="onBaseTabClick"
 		:baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="flex-mid2 container">
+				<div class="flex-mid2">
 					<base-form class="b-form"></base-form>
 				</div>
 			</template>

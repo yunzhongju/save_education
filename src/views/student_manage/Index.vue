@@ -2,7 +2,7 @@
 	<div>
 		<base-tabs @onBaseTabClick="onBaseTabClick" :baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
+				<div class="">
 					<el-row>
 		<!-- 				<el-col :span="0">
 							<div class="grid-content bg-purple">
@@ -220,7 +220,7 @@ export default {
 		},
 		handleStudentDeatil(index,row){
 			api.queryStudentDetailAPI({userCode:row.userCode}).then(res=>{
-				console.log(res);
+				// console.log(res);
 				this.currentStudent=res.data
 				this.dialogVisibleDetail=true
 			})
@@ -236,7 +236,7 @@ export default {
 		handleClose(done){done()},
 		//切换baseTabs
 		onBaseTabClick(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//编辑
 		handleEditStudent(index, row) {
@@ -272,11 +272,11 @@ export default {
 		},
 		//选中数据
 		handleSelectionChange(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//按时间筛选
 		handleDateTime(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//搜索
 		handleSerach() {
@@ -292,15 +292,15 @@ export default {
 		},
 		//获取当前页
 		getCurrentPage(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//获取pagesize
 		getPageSize(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		queryStudentByPage(params){
 			api.queryStudentByPageAPI(params).then(res=>{
-				// console.log('学员列表',res);
+				// // console.log('学员列表',res);
 				if(res.code==0){
 					this.studentList=res.data.records
 					this.total=res.data.total
@@ -311,7 +311,7 @@ export default {
 	created() {
 		this.queryStudentByPage({pageNo:1,pageSize:10})
 		api.querySysOrgByPageAPI({pageNo:1,pageSize:100}).then(res=>{
-			// console.log('机构列表',res);
+			// // console.log('机构列表',res);
 			if(res.code==0){
 				this.orgList=res.data.records
 			}

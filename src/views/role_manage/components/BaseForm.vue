@@ -10,7 +10,7 @@
 		  <el-form-item label="姓名" prop="userName">
 		    <el-input v-model="form.userName"></el-input>
 		  </el-form-item>
-			<el-form-item label="等级" prop="level">
+			<el-form-item label="等级">
 			  <el-input v-model.number="form.level"></el-input>
 			</el-form-item>
 			<el-form-item label="出生日期" prop="">
@@ -23,8 +23,8 @@
 			</el-form-item>
 			<el-form-item label="登陆权限" prop="loginAuthor">
 			  <el-radio-group v-model="form.loginAuthor">
-			      <el-radio :label="0">PC权限(管理员)</el-radio>
-			      <el-radio :label="1">APP权限(学员)</el-radio>
+			      <el-radio :label="1">PC权限(管理员)</el-radio>
+			      <el-radio :label="0">APP权限(学员)</el-radio>
 			      <el-radio :label="2">PC与APP权限(讲师)</el-radio>
 			    </el-radio-group>
 			</el-form-item>
@@ -39,9 +39,15 @@
 			</el-form-item>
 			<el-form-item label="机构" prop="orgCode">
 				<el-input v-model="form.orgName" placeholder="请选择机构"></el-input>
-				<el-tree :data="orgList" :props="{label:'orgName', children:'childrenOrg'}" @node-click="handleNodeClick"></el-tree>
+				<el-tree 
+					:data="orgList" 
+					node-key="orgCode"
+					:props="{label:'orgName', children:'childrenOrg'}" 
+					show-checkbox
+					:default-checked-keys="[form.orgCode]"
+					@node-click="handleNodeClick"></el-tree>
 			</el-form-item>
-			<el-form-item label="角色添加" prop="">
+			<el-form-item label="角色添加" prop="" v-if="isAdmin">
 				<el-row>
 				  <el-col :span="24"><div class="grid-content bg-purple-dark marg-top20">
 						 <el-checkbox-group v-model="form.roleCodes">
@@ -64,9 +70,18 @@
 <script>
 	import api from '../../../api/api.js'
 	import UploadImg from '../../../components/BaseUploadImg.vue'
+	import {mapState} from 'vuex'
   export default {
 		components:{
 			UploadImg
+		},
+		computed:{
+			...mapState({
+				user:s=>s.userInfo
+			}),
+			isAdmin(){
+				return this.$store.state.userInfo.projectDepartment=='admin'?true:false
+			}
 		},
 		inject:['avatar'],
 		props:{
@@ -109,8 +124,7 @@
 				rulesForm:{
 					 userCode: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
 					 userName: [{ required: true, message: '请输入用户姓名', trigger: 'blur' }],
-					 mobileNo: [{ required: true, message: '请输入用户手机号', trigger: 'blur' },
-											{ validator: validatePhone, trigger: 'blur' }],
+					 mobileNo: [{ required: true, message: '请输入用户手机号', trigger: 'blur' }],
 					 orgCode: [{ required: true, message: '请选择机构', trigger: 'change' }],
 					 roleCodes: [{ required: true, message: '请添加角色', trigger: 'blur' }],
 					 loginAuthor: [{ required: true, message: '请选择登陆权限', trigger: 'blur' }],
@@ -123,12 +137,12 @@
 				this.form.avatar=url
 			},
 			handleNodeClick(node){
-				// console.log(node);
+				// // console.log(node);
 				this.form.orgCode=node.orgCode
 				this.form.orgName=node.orgName
 			},
 			handleOrgList(arr,code){
-				// console.log(arr);
+				// // console.log(arr);
 				let that =this
 				for(let i=0;i<arr.length;i++){
 					if(arr[i].orgCode==code){
@@ -138,7 +152,7 @@
 				}
 			},
 			getCheckedNodes(arr,checkArr){
-				// console.log(checkArr);
+				// // console.log(checkArr);
 				this.form.menu=checkArr.checkedKeys
 			},
 			handleAddMenuChild(node){
@@ -239,7 +253,7 @@
 			getSysOrgTree(){
 				api.getSysOrgTreeAPI().then(res=>{
 					if(res.code==0){
-						// console.log('机构列表',res);
+						// // console.log('机构列表',res);
 						this.orgList=res.data
 					}
 				})
@@ -256,13 +270,13 @@
 		created() {
 			this.getSysOrgTree()
 			this.querySysRoleList()
-			// console.log(11111111111,this);
+			// // console.log(11111111111,this);
 		},
 		mounted() {
 			if(this.currentUser){
 				this.form.id=this.currentUser.id
 				api.querySysUserDetailAPI({userCode:this.currentUser.userCode}).then(res=>{
-					// console.log(22222222,res);
+					// // console.log(22222222,res);
 					this.form.userCode=this.currentUser.userCode
 					this.form.userName=this.currentUser.userName
 					this.form.mobileNo=this.currentUser.mobileNo

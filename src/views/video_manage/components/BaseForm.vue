@@ -92,7 +92,7 @@
 					if (valid) {
 						alert('submit!');
 					} else {
-						// console.log('error submit!!');
+						// // console.log('error submit!!');
 						return false;
 					}
 				});
@@ -104,15 +104,15 @@
 			getCurrentPage(val){},
 			handleSelectionChange(){},
 			handleEdit(index,row){
-				// console.log(index,row);
+				// // console.log(index,row);
 				this.form.exam=row.name
 			},
 			handleNodeClick(data) {
 				this.form.type=data.label
-				// console.log(data);
+				// // console.log(data);
 			},
 			getContent(val){
-				// console.log(val);
+				// // console.log(val);
 			}
     }
   }

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="m-auto">
 		<el-form ref="form" :model="form" :rules="rulesForm" label-width="100px">
 		  <el-form-item label="课程名称" prop="title">
 		    <el-input type="text" v-model="form.title"></el-input>
@@ -26,117 +26,31 @@
 			<el-form-item label="课程封面" prop="coverimg">
 				<upload-img 
 					@getImgUrl="getImgUrl" 
-					:url="currentCourse?currentCourse.coverimg:''"></upload-img>
+					:url="currentCourse?currentCourse.cover:''"></upload-img>
 			</el-form-item>
-			<el-form-item label="课程讲师" prop="title">
+			<el-form-item label="课程机构" prop="orgCodes" v-if="isAdmin">
+			  <el-cascader
+					style="width: 100%;"
+					:options="orgList"
+					v-model="form.orgCodes"
+					@change="onHandleChangeNode"
+					:show-all-levels="false"
+					:props="{ multiple: true, checkStrictly: false, label:'orgName',value:'orgCode',children:'childrenOrg', emitPath:false }"
+					clearable>
+				</el-cascader>
+			</el-form-item>
+			<el-form-item label="课程讲师">
 				<el-row>
 				  <el-col :span="24"><div class="grid-content bg-purple-dark">
 						<el-input type="text" v-model="form.teacherName"></el-input>
 					</div></el-col>
-				</el-row>
-				<el-row :gutter="20">
-				  <el-col :span="6"><div class="grid-content bg-purple-dark">
-						<el-cascader
-							:options="orgList"
-							:show-all-levels="false"
-							slot="left-footer" 
-							@change="handleChooseOrgType"
-							placeholder="请选择机构"
-							style="width: 100%;"
-							size="mini"
-							:props="{ checkStrictly: true,label:'orgName', children:'childrenOrg',value:'orgCode'}"
-							clearable></el-cascader>
-					</div></el-col>
-					<el-col :span="0"><div class="grid-content bg-purple-dark">
-						<el-input
-						  size="small"
-							placeholder="搜索试卷名称"
-							@change="handleSerach"
-							clearable
-							suffix-icon="el-icon-search"
-							v-model="serachValue">
-						</el-input>
-					</div></el-col>
-					<el-col :span="0"><div class="grid-content bg-purple-dark">
-						<el-input
-						  size="small"
-							placeholder="搜索试卷名称"
-							@change="handleSerach"
-							clearable
-							suffix-icon="el-icon-search"
-							v-model="serachValue">
-						</el-input>
-					</div></el-col>
-				</el-row>
-				<el-row>
-				  <el-col :span="24"><div class="grid-content bg-purple-dark">
-						<base-table
-							:total="0" 
-							:showFoot="false"
-							@getPageSize="getPageSize" 
-							@getCurrentPage="getCurrentPage">
-							<el-table 
-								ref="multipleTable" 
-								:data="teacherList" 
-								border
-								tooltip-effect="dark" 
-								style="width: 100%;" 
-								@selection-change="handleSelectionChange">
-								<el-table-column 
-									label="编号" 
-									prop="id" 
-									align="center" 
-									width="55">
-									<template slot-scope="scope">
-										<span>{{scope.$index+1}}</span>
-									</template>
-								</el-table-column>
-								<el-table-column
-									label="头像"
-									align="center"
-									>
-									<template slot-scope="scope">
-										<div class="block"><el-avatar :size="50" :src="scope.row.avatar"></el-avatar></div>
-									</template>
-								</el-table-column>
-								<el-table-column 
-									prop="userName" 
-									label="姓名" 
-									align="center"></el-table-column>
-									<el-table-column
-										label="性别" 
-										align="center">
-										<template slot-scope="scope">
-											<span>{{scope.row.sex==0?'男':'女'}}</span>
-										</template>
-									</el-table-column>
-								<el-table-column 
-									prop="integral" 
-									label="等级" 
-									align="center">
-									<template slot-scope="scope">
-										<span>{{scope.row.level?scope.row.level:'0'}}</span>
-									</template>
-								</el-table-column>
-								<el-table-column 
-									prop="mobileNo" 
-									label="手机号" 
-									align="center">
-								</el-table-column>
-								<el-table-column 
-									label="操作" 
-									align="center">
-									<template slot-scope="scope">
-										<el-button 
-											size="mini" 
-											type="text" 
-											@click="handleChooseTeacher(scope.$index, scope.row)">选择</el-button>
-									</template>
-								</el-table-column>
-							</el-table>
-						</base-table>
-					</div></el-col>
-				</el-row>	  
+				</el-row> 
+			</el-form-item>
+			<el-form-item label="是否推荐">
+			    <el-radio-group v-model="form.recomment">
+			      <el-radio :label="1">是</el-radio>
+			      <el-radio :label="0">否</el-radio>
+			    </el-radio-group>
 			</el-form-item>
 		  <el-form-item>
 		    <el-button type="primary" @click="onSubmit('form')">{{id?'更新':'创建'}}</el-button>
@@ -176,7 +90,9 @@
 					desc:'',
 					coverimg:'',
 					teacherCode:'',
-					teacherName:''
+					recomment:0,
+					teacherName:'',
+					orgCodes:this.$store.state.userInfo.projectDepartment=='admin'?[]:[this.$store.state.userInfo.projectDepartment]
         },
 				rulesForm:{
 					 title: [{ required: true, message: '请输入课程名称', trigger: 'blur' }],
@@ -185,15 +101,25 @@
 					 desc: [{ required: true, message: '请输入课程简介', trigger: 'blur' }],
 					 content: [{ required: true, message: '请选择课程类容', trigger: 'blur' }],
 					 coverimg: [{ required: true, message: '请上传课程封面', trigger: 'blur' }],
+					 orgCodes: [{ required: true, message: '请选择机构', trigger: 'blur' }],
 				},
       }
     },
+		computed:{
+			isAdmin(){
+				return this.$store.state.userInfo.projectDepartment=='admin'?true:false
+			}
+		},
     methods: {
+			onHandleChangeNode(node){
+				// console.log(111,node);
+				this.form.orgCodes=node
+			},
 			handleChooseCoureseType(value){
 				this.form.courseTypeName=this.courseTypeList.filter(item=>item.courseType==value)[0].courseTypeName
 			},
 			handleChooseOrgType(node){
-				// console.log(node);
+				// // console.log(node);
 				let code=node[node.length-1]
 				this.queryTeacherList({roleCode:'teacher',orgCode:code})
 			},
@@ -216,8 +142,10 @@
 							introduction:this.form.desc,
 							cover:this.form.coverimg,
 							avatar:this.form.avatar,
-							teacherCode:this.form.teacherCode,
+							// teacherCode:this.form.teacherCode,
 							teacherName:this.form.teacherName,
+							orgCodes:this.form.orgCodes,
+							recomment:this.form.recomment
 						}
 						if(!this.id){
 							api.addCourseAPI(params).then(res=>{
@@ -245,10 +173,12 @@
 								introduction:this.form.desc,
 								cover:this.form.coverimg,
 								avatar:this.form.avatar,
-								teacherCode:this.form.teacherCode,
+								// teacherCode:this.form.teacherCode,
 								teacherName:this.form.teacherName,
+								orgCodes:this.form.orgCodes,
+								recomment:this.form.recomment
 							}
-							// console.log(args);
+							// // console.log(args);
 							api.updateCourseAPI(args).then(res=>{
 								if(res.code==0){
 									this.$message({
@@ -286,11 +216,11 @@
 			},
 			handleNodeClick(data) {
 				this.form.type=data.label
-				// console.log(data);
+				// // console.log(data);
 			},
 			queryTeacherList(params){
 				api.getUserListAPI(params).then(res=>{
-					console.log('讲师列表',res);
+					// console.log('讲师列表',res);
 					if(res.code==0){
 						this.teacherList=res.data
 					}
@@ -298,15 +228,23 @@
 			},
 			querySysOrgByPage(params){
 				api.getSysOrgTreeAPI(params).then(res=>{
-					// console.log('机构列表',res.data);
+					// // console.log('机构列表',res.data);
 					if(res.code==0){
+						this._handleOrgList(res.data)
 						this.orgList=res.data
 					}
 				})
 			},
+			_handleOrgList(arr){
+				arr.forEach(item=>{
+					item.childrenOrg.forEach(each=>{
+						delete each.childrenOrg
+					})
+				})
+			},
 			queryCourseTypeList(params){
 				api.queryCourseTypeListAPI(params).then(res=>{
-					// console.log('课程分类',res);	
+					// // console.log('课程分类',res);	
 					if(res.code==0){
 						this.courseTypeList=res.data
 					}
@@ -329,7 +267,11 @@
 				this.form.courseTypeName=this.currentCourse.courseTypeName
 				this.form.coverimg=this.currentCourse.cover
 				this.form.teacherCode=this.currentCourse.teacherCode
-				this.form.teacherName=this.currentCourse.teacherName
+				this.form.teacherName=this.currentCourse.teacherName||'无'
+				this.form.recomment=Number(this.currentCourse.recomment)
+				if(this.isAdmin){
+					this.form.orgCodes=this.currentCourse.orgCodes?this.currentCourse.orgCodes:[]
+				}
 			}
 		},
 		mounted() {

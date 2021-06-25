@@ -1,10 +1,9 @@
 <template>
 	<div class="in-animate">
 		<base-tabs
-		@onBaseTabClick="onBaseTabClick"
 		:baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
+				<div class="">
 					<el-row>
 					  <el-col :span="24">
 							<div class="grid-content bg-purple-dark">
@@ -15,7 +14,7 @@
 											placeholder="搜索试卷名称"
 											clearable
 											suffix-icon="el-icon-search"
-											v-model="serachValue">
+											v-model="serachForm.context">
 										</el-input>
 									</li>
 									<li class="marg-right30">
@@ -23,7 +22,7 @@
 											type="primary" 
 											size="mini" 
 											icon="el-icon-search"
-											@click="handleSerach"
+											@click="getData"
 											>
 										搜索
 										</el-button>
@@ -47,7 +46,6 @@
 							<div class="grid-content bg-purple-dark marg-top20">
 								<base-table
 								:total="total"
-								@getPageSize="getPageSize"
 								@getCurrentPage="getCurrentPage"
 								>
 									<el-table
@@ -86,6 +84,18 @@
 											show-overflow-tooltip>
 										</el-table-column>
 										<el-table-column
+											prop="paperTime"
+											label="考试时长"
+											align="center"
+											show-overflow-tooltip>
+										</el-table-column>
+										<el-table-column
+											prop="remark"
+											label="试卷说明"
+											align="center"
+											show-overflow-tooltip>
+										</el-table-column>
+										<el-table-column
 											prop="createTime"
 											label="创建时间"
 											align="center"
@@ -94,12 +104,6 @@
 										<el-table-column
 											prop="updateTime"
 											label="更新时间"
-											align="center"
-											show-overflow-tooltip>
-										</el-table-column>
-										<el-table-column
-											prop="remark"
-											label="试卷说明"
 											align="center"
 											show-overflow-tooltip>
 										</el-table-column>
@@ -127,19 +131,6 @@
 				</div>
 			</template>
 		</base-tabs>
-		
-		<el-dialog
-		  title="详情"
-		  :visible.sync="dialogVisible"
-		  width="30%"
-			center
-		  :before-close="handleClose">
-		  <span>
-				<base-detail
-					:detail="paperDetail"
-				></base-detail>
-			</span>
-		</el-dialog>
 	</div>
 </template>
 
@@ -157,12 +148,14 @@
 		data(){
 			return {
 				loading:false,
-				dialogVisible:false,
-				paperDetail:'',
-				serachValue:'',
 				paperList:[],
 				total:0,
 				baseTabs:[{label: '试卷管理',value: '1'}],
+				serachForm:{
+					pageNo:1,
+					pageSize:10,
+					context:''
+				}
 			}
 		},
 		methods:{
@@ -173,20 +166,12 @@
 						id:row.id
 					}
 				})
-			},
-			handleClose(done){done()},
+			},	
 			handlePaperDetail(index,row){
-				api.queryPaperDetailAPI({id:row.id}).then(res=>{
-					// console.log(res);
-					if(res.code==0){
-						this.paperDetail=res.data
-						this.dialogVisible=true
-					}
+				this.$router.push({
+					path:'test_paper_detail',
+					query:{id:row.id}
 				})
-			},
-			onBaseTabClick(){},
-			handleSerach(){
-				this.queryPaperByPage({pageNo:1,pageSize:10,context:this.serachValue})
 			},
 			handleAdd(){
 				this.$router.push({
@@ -196,11 +181,9 @@
 					}
 				})
 			},
-			getPageSize(val){
-				this.queryPaperByPage({pageNo:1,pageSize:val})
-			},
 			getCurrentPage(val){
-				this.queryPaperByPage({pageNo:val,pageSize:10})
+				this.serachForm.pageNo=val
+				this.getData()
 			},
 			handleDeletePaper(index,row){
 				this.$confirm('此操作将除该试卷, 是否继续?', '提示', {
@@ -210,7 +193,7 @@
 				}).then(() => {
 					api.deletePaperAPI({id:row.id}).then(res=>{
 						if(res.code==0){
-							this.queryPaperByPage({pageNo:1,pageSize:10})
+							this.getData()
 							this.$message({
 								type: 'success',
 								message: '删除成功!'
@@ -227,17 +210,17 @@
 			queryPaperByPage(params){
 				this.loading=true
 				api.queryPaperByPageAPI(params).then(res=>{
-					// console.log('试卷list',res);
-					if(res.code==0){
-						this.paperList=res.data.records
-						this.total=res.data.total
-						this.loading=false
-					}
+					this.paperList=res.data.records
+					this.total=res.data.total
+					this.loading=false
 				})
+			},
+			getData(){
+				this.queryPaperByPage(this.serachForm)
 			}
 		},
 		created() {
-			this.queryPaperByPage({pageNo:1,pageSize:10})
+			this.getData()
 		}
 	}
 </script>

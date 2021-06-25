@@ -2,7 +2,7 @@
 	<div class="in-animate">
 		<base-tabs @onBaseTabClick="onBaseTabClick" :baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
+				<div class="">
 					<el-row>
 						<el-col :span="24">
 							<div class="grid-content bg-purple-light">
@@ -32,8 +32,8 @@
 						<el-col :span="24">
 							<div class="grid-content bg-purple-dark marg-top20">
 								<base-table 
-								:total="total" 
-								:showFoot="false">
+									@getCurrentPage="getCurrentPage"
+									:total="total">
 									<el-table 
 									ref="multipleTable" 
 									:data="tableData" 
@@ -120,7 +120,7 @@
 		  :visible.sync="dialogVisibleDetail"
 		  width="40%"
 			center
-		  :before-close="handleClose">
+		  :before-close="handleClose1">
 		  <span>
 				<base-detail
 					:detail="groupDetail"
@@ -144,11 +144,11 @@
 
 <script>
 import GroupForm from './components/BaseFormGroup.vue'
-import BaseTabs from '../../components/BaseTabs.vue';
-import BaseTable from '../../components/BaseTable.vue';
+import BaseTabs from '@/components/BaseTabs.vue';
+import BaseTable from '@/components/BaseTable.vue';
 import UserList from './components/BaseUserList.vue'
 import BaseDetail from './components/BaseGroup.vue'
-import api from '../../api/api.js'
+import api from '@/api/api.js'
 export default {
 	components: {
 		BaseTabs,
@@ -166,6 +166,8 @@ export default {
 			total:0,
 			dialogVisibleList:false,
 			dialogVisible:false,
+			pageNo:1,
+			pagesize:10,
 			serachValue: '',
 			dateTimer: '', //按时间筛选
 			baseTabs: [
@@ -178,6 +180,15 @@ export default {
 			],
 		};
 	},
+	computed:{
+		serachForm(){
+			return {
+				pageNo:this.pageNo,
+				pageSize:this.pagesize,
+				groupName:this.serachValue
+			}
+		}
+	},
 	methods: {
 		handleRecord(index,row){
 			this.$router.push({
@@ -188,16 +199,22 @@ export default {
 			})
 		},
 		submit(){
-			this.attendanceGroupQueryList({pageNo:1,pageSize:10})
+			this.getData()
 			this.dialogVisible=false
 		},
 		resetForm(){
 			this.dialogVisible=false
 		},
 		handleGroupDetail(index,row){
+			// this.$router.push({
+			// 	path:'group_detail',
+			// 	query:{
+			// 		id:row.id
+			// 	}
+			// })
 			api.attendanceGroupDetailAPI({id:row.id}).then(res=>{
 				if(res.code==0){
-					// console.log(res.data);
+					// // console.log(res.data);
 					this.groupDetail=res.data
 					this.dialogVisibleDetail=true
 				}
@@ -207,22 +224,31 @@ export default {
 		handleUserList(index,row){
 			this.dialogVisibleList=true
 		},
-		handleClose(done){done()},
+		handleClose(done){
+			this.$confirm('确认关闭？')
+				.then(_ => {
+					done();
+				})
+				.catch(_ => {});
+		},
+		handleClose1(done){
+			done();
+		},
 		//切换baseTabs
 		onBaseTabClick(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//编辑
 		handleEdit(index, row) {
 			this.id=row.id
 			this.dialogVisible=true
-			// console.log(row);
+			// // console.log(row);
 		},
 		//撤销
 		handleCancel(index, row){},
 		//删除
 		handleDelete(index, row) {
-			// console.log(row);
+			// // console.log(row);
 			this.$confirm('此操作将删除该考勤组, 是否继续?', '提示', {
 				confirmButtonText: '确定',
 				cancelButtonText: '取消',
@@ -236,7 +262,7 @@ export default {
 								message: '删除成功!'
 							});
 						}
-						this.attendanceGroupQueryList({pageNo:1,pageSize:10})
+						this.getData()
 					})
 				})
 				.catch(() => {
@@ -248,20 +274,18 @@ export default {
 		},
 		//选中数据
 		handleSelectionChange(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//按时间筛选
 		handleDateTime(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//搜索
 		handleSerach() {
-			this.attendanceGroupQueryList({pageNo:1,pageSize:10,groupName:this.serachValue})
+			this.pageNo=1
+			this.getData()
 		},
-		//汇总统计
-		handleSummary() {},
-		//情况统计
-		handleHappen() {},
+
 		//创建考试
 		handleAdd() {
 			this.id=null
@@ -270,7 +294,8 @@ export default {
 		},
 		//获取当前页
 		getCurrentPage(val) {
-			this.attendanceGroupQueryList({pageNo:val,pageSize:10})
+			this.pageNo=val
+			this.getData()
 		},
 		//获取pagesize
 		getPageSize(val) {
@@ -279,17 +304,20 @@ export default {
 		attendanceGroupQueryList(params){
 			this.loading=true
 			api.attendanceGroupPageAPI(params).then(res=>{
-				// console.log(res);
+				// // console.log(res);
 				if(res.code==0){
 					this.tableData=res.data.records
 					this.total=res.data.total
 					this.loading=false
 				}
 			})
+		},
+		getData(){
+			this.attendanceGroupQueryList(this.serachForm)
 		}
 	},
 	created() {
-		this.attendanceGroupQueryList({pageNo:1,pageSize:10})
+		this.getData()
 	}
 };
 </script>

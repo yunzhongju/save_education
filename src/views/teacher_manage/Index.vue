@@ -4,7 +4,7 @@
 		@onBaseTabClick="onBaseTabClick" 
 		:baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
+				<div class="">
 					<el-row>
 						<el-col :span="24">
 							<div class="grid-content bg-purple-light">
@@ -198,10 +198,16 @@ export default {
 			this.queryTeacherByPage({pageNo:1,pageSize:10})
 			this.dialogVisible=false
 		},
-		handleClose(done){done()},
+		handleClose(done){
+			this.$confirm('确认关闭？')
+				.then(_ => {
+					done();
+				})
+				.catch(_ => {});
+		},
 		//切换baseTabs
 		onBaseTabClick(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//编辑
 		handleEditTeacher(index, row) {
@@ -212,14 +218,14 @@ export default {
 		handleCancel(index, row){},
 		handleTeacherDetail(index,row){
 			api.queryTeacherDetailAPI({userCode:row.userCode}).then(res=>{
-				// console.log(res);
+				// // console.log(res);
 				this.currentTeacher=res.data
 				this.dialogVisibleDetail=true
 			})
 		},
 		//删除
 		handleDelete(index, row) {
-			// console.log(row);
+			// // console.log(row);
 			this.$confirm('此操作将删除该讲师, 是否继续?', '提示', {
 				confirmButtonText: '确定',
 				cancelButtonText: '取消',
@@ -245,11 +251,11 @@ export default {
 		},
 		//选中数据
 		handleSelectionChange(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//按时间筛选
 		handleDateTime(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//搜索
 		handleSerach() {
@@ -274,7 +280,7 @@ export default {
 		},
 		queryTeacherByPage(params){
 			api.queryTeacherByPageAPI(params).then(res=>{
-				// console.log('讲师列表',res);
+				// // console.log('讲师列表',res);
 				if(res.code==0){
 					this.teacherList=res.data.records
 					this.total=res.data.total
@@ -285,7 +291,7 @@ export default {
 	created() {
 		this.queryTeacherByPage({pageNo:1,pageSize:10})
 		api.querySysOrgByPageAPI({pageNo:1,pageSize:100}).then(res=>{
-			// console.log('机构列表',res);
+			// // console.log('机构列表',res);
 			if(res.code==0){
 				this.orgList=res.data.records
 			}

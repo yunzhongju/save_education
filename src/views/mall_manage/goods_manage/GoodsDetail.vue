@@ -40,7 +40,7 @@
 									</li>
 									<li>
 										<span class="marg-top10">商品销量 :  {{detail.saleVolume}}</span>
-										<span class="marg-top10">商品分类 :  {{detail.goodsCategory}}</span>
+										<span class="marg-top10">商品分类 :  {{detail.goodsCategoryName}}</span>
 										<span class="marg-top10">所需积分 :  {{detail.needIntegral}}</span>
 									</li>
 									<li>
@@ -306,7 +306,13 @@
 				this.imgForm.imageType=2
 				this.dialogVisible=true
 			},
-			handleClose(done){done()},
+			handleClose(done){
+				this.$confirm('确认关闭？')
+					.then(_ => {
+						done();
+					})
+					.catch(_ => {});
+			},
 			onBaseTabClick(){},
 			getImgUrl(url){
 				this.imgForm.imagePath=url
@@ -314,7 +320,7 @@
 			submitForm(formName) {
 				this.$refs[formName].validate((valid) => {
 					if (valid) {
-						// console.log(this.imgForm);
+						// // console.log(this.imgForm);
 						if(!this.imgForm.id){
 							addGoodsPicAPI(this.imgForm).then(res=>{
 								if(res.code===0){
@@ -350,7 +356,7 @@
 							})
 						}
 					} else {
-						// console.log('error submit!!');
+						// // console.log('error submit!!');
 						return false;
 					}
 				});
@@ -361,7 +367,7 @@
 			},
 			queryGoodsDetail(params){
 				queryGoodsDetailAPI(params).then(res=>{
-					// console.log(res);
+					// // console.log(res);
 					this.detail=res.data
 					this.imgForm.goodsCode=res.data.goodsCode
 					this.detailPic=res.data.detailPic

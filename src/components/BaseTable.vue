@@ -39,11 +39,11 @@
 		},
     methods: {
       handleSizeChange(val) {
-        // console.log(`每页 ${val} 条`);
+        // // console.log(`每页 ${val} 条`);
 				this.$emit('getPageSize',val)
       },
       handleCurrentChange(val) {
-        // console.log(`当前页: ${val}`);
+        // // console.log(`当前页: ${val}`);
 				this.$emit('getCurrentPage',val)
       }
     },

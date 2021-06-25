@@ -84,7 +84,7 @@
 		created() {
 			this.id=this.$route.query.id
 			api.noticeByDetailAPI({id:this.id}).then(res=>{
-				// console.log('公告详情',res);
+				// // console.log('公告详情',res);
 				this.detail=res.data
 			})
 		}

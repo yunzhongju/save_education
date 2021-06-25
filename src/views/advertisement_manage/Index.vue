@@ -2,7 +2,7 @@
 	<div class="in-animate">
 		<base-tabs @onBaseTabClick="onBaseTabClick" :baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
+				<div class="" style="height: 800px;">
 					<el-row v-loading="loading">
 					  <el-col :span="24"><div class="grid-content bg-purple-dark">
 							<base-banner
@@ -185,7 +185,13 @@ export default {
 				
 			}
 		},
-		handleClose(done){done()},
+		handleClose(done){
+			this.$confirm('确认关闭？')
+				.then(_ => {
+					done();
+				})
+				.catch(_ => {});
+		},
 		handleAddBanner(){
 			this.current=null
 			this.dialogVisible=true
@@ -196,11 +202,11 @@ export default {
 		},
 		//切换baseTabs
 		onBaseTabClick(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//编辑
 		handleEdit(index, row) {
-			// console.log(row);
+			// // console.log(row);
 		},
 		//撤销
 		handleCancel(index, row){},
@@ -218,15 +224,15 @@ export default {
 		},
 		//选中数据
 		handleSelectionChange(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//按时间筛选
 		handleDateTime(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//搜索
 		handleSerach(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//汇总统计
 		handleSummary() {},
@@ -238,17 +244,17 @@ export default {
 		},
 		//获取当前页
 		getCurrentPage(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//获取pagesize
 		getPageSize(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		bannerQuery(){
 			this.loading=true
 			api.bannerQueryAPI().then(res=>{
 				if(res.code==0){
-					// console.log('bannerList',res);
+					// // console.log('bannerList',res);
 					this.bannerList=res.data
 					this.loading=false
 				}

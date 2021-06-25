@@ -4,7 +4,7 @@
 		@onBaseTabClick="onBaseTabClick"
 		:baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
+				<div class="">
 					<el-row>
 					  <el-col :span="3"><div class="grid-content bg-purple marg-top20">
 							<base-classification></base-classification>

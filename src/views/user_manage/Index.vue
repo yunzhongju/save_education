@@ -2,7 +2,7 @@
 	<div class="in-animate">
 		<base-tabs @onBaseTabClick="onBaseTabClick" :baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
+				<div class="">
 					<el-row>
 						<el-col :span="0">
 							<div class="grid-content bg-purple">
@@ -47,8 +47,7 @@
 									v-loading="loading"
 									tooltip-effect="dark" 
 									height="600"
-									max-height="650"
-									@selection-change="handleSelectionChange">
+									max-height="650">
 										<el-table-column
 											label="编号"
 											align="center"
@@ -115,27 +114,59 @@
 		<el-dialog
 		  title="添加/修改角色"
 		  :visible.sync="dialogVisible"
+			:before-close="handleClose"
 		  width="30%"
-			center
-		  :before-close="handleClose">
-		  <span>
-				<base-form 
-					v-if="dialogVisible"
-					:menu="menu"
-					:currentRole="roleDetail"
-					@update="update"
-					@resetForm="resetForm"
-					@submit="submit"></base-form>
-			</span>
+			center>
+			<div>
+				<el-form ref="form" :model="form" :rules="rulesForm" label-width="100px">
+					<el-form-item label="角色编码" prop="roleCode">
+					  <el-input v-model="form.roleCode"></el-input>
+					</el-form-item>
+				  <el-form-item label="角色名称" prop="roleName">
+				    <el-input v-model="form.roleName"></el-input>
+				  </el-form-item>
+					<el-form-item label="角色描述" prop="roleDesc">
+					  <el-input v-model="form.roleDesc"></el-input>
+					</el-form-item>
+					<el-form-item label="添加菜单" prop="menuCodes">
+						<el-row>
+						  <el-col :span="24"><div class="grid-content bg-purple-dark marg-top20">
+								<el-tree
+									ref="menutree"
+									:data="menu" 
+									show-checkbox
+									v-model="form.menuCodes"
+									accordion
+									node-key="menuCode" 
+									@check="getCheckedNodes"
+									:props="{label:'menuName',children:'childMenus'}">
+									<span class="custom-tree-node" slot-scope="{ node, data }">
+										<span>{{ node.label }}</span>
+										<span>
+											<!-- <el-button type="text" size="mini" @click="handleAddMenuChild(data)">添加</el-button>
+											<el-button type="text" size="mini" @click="handleDeleteMenu(data)">取消</el-button> -->
+										</span>
+									</span>
+								</el-tree>
+							</div></el-col>
+						</el-row>
+					</el-form-item>
+				  <el-form-item>
+				    <el-button type="primary" @click="onSubmit('form')">{{form.id?'更新':'创建'}}</el-button>
+				    <el-button @click="resetForm('form')">取消</el-button>
+				  </el-form-item>
+				</el-form>
+			</div>
 		</el-dialog>
 		
 		
 		<el-dialog
 		  title="详情"
+			v-if="dialogVisibleDetail"
 		  :visible.sync="dialogVisibleDetail"
+			:before-close="handleClose1"
 		  width="30%"
-			center
-		  :before-close="handleClose">
+			center>
 		  <span>
 				<base-detail
 					:menu="menu"
@@ -149,7 +180,7 @@
 <script>
 import BaseTabs from '../../components/BaseTabs.vue';
 import BaseTable from '../../components/BaseTable.vue';
-import BaseForm from './components/BaseForm.vue'
+// import BaseForm from './components/BaseForm.vue'
 import BaseDetail from './components/BaseDetail.vue'
 import api from '../../api/api.js'
 export default {
@@ -157,11 +188,11 @@ export default {
 	components: {
 		BaseTabs,
 		BaseTable,
-		BaseForm,
 		BaseDetail
 	},
 	data() {
 		return {
+			currentRole:null,
 			loading:false,
 			dialogVisibleDetail:false,
 			RoleDetail:null,
@@ -174,38 +205,111 @@ export default {
 			baseTabs: [{label: '角色管理',value: '1'}],
 			roleList: [],
 			total:0,
-			pageSize:10
+			pageSize:10,
+			form: {
+				roleCode:'',
+				roleName:'',
+			  roleDesc: '',
+				menuCodes:[]
+			},
+			rulesForm:{
+				 roleCode: [{ required: true, message: '请输入角色编码', trigger: 'blur' }],
+				 roleName: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
+				 roleDesc: [{ required: true, message: '请输入角色描述', trigger: 'blur' }],
+				 menuCodes: [{ required: true, message: '请选择菜单', trigger: 'blur' }],
+			},
 		};
 	},
 	methods: {
+		handleClose(done){
+			this.$confirm('确认关闭？')
+				.then(_ => {
+					done();
+				})
+				.catch(_ => {});
+		},
+		handleClose1(done){
+			done();
+		},
+		onSubmit(formName) {
+			 this.$refs[formName].validate((valid) => {
+				if (valid) {
+					if(!this.form.id){
+						api.addSysRoleAPI(this.form).then(res=>{
+							if(res.code==0){
+								this.$message({
+									message:'创建成功',
+									type:'success'
+								})
+							}else{
+								this.$message({
+									type:'warning',
+									message:res.msg
+								})
+							}
+						})
+					}else{
+						api.updateSysRoleAPI(this.form).then(res=>{
+							if(res.code==0){
+								this.$message({
+									message:'更新成功',
+									type:'success'
+								})
+								this.$refs[formName].resetFields();
+								this.$emit('update')
+							}else{
+								this.$message({
+									type:'warning',
+									message:res.msg
+								})
+							}
+						})
+					}
+					this.dialogVisible=false
+					this.reloadAll()
+				} else {
+					this.$message({
+						message:'请填写表单',
+						type:'warning'
+					})
+					return false;
+				}
+			});
+		},
+		getCheckedNodes(arr,checkArr){
+			this.form.menuCodes=checkArr.checkedKeys
+		},
+
 		resetForm(){
 			this.dialogVisible=false
 		},
-		submit(){
-			this.querySysRoleByPage({pageNo:1,pageSize:10})
-			this.dialogVisible=false
-		},
-		update(){
-			this.reloadAll()
-			this.querySysRoleByPage({pageNo:1,pageSize:10})
-			this.dialogVisible=false
-		},
-		handleClose(done){done()},
+
 		//切换baseTabs
-		onBaseTabClick(val) {
-			// console.log(val);
-		},
+		onBaseTabClick(val) {},
 		//编辑
 		handleEditRole(index, row) {
-			this.roleDetail=row
-			this.dialogVisible=true
+			api.querySysRoleDetailAPI({roleCode:row.roleCode}).then(res=>{
+				// console.log('角色详情',res);
+				if(res.code==0){
+					this.form.id=res.data.id
+					this.form.roleCode=res.data.roleCode
+					this.form.roleName=res.data.roleName
+					this.form.roleDesc=res.data.roleDesc
+					this.form.menuCodes=res.data.menuCodes
+					this.dialogVisible=true
+					this.$nextTick(()=>{
+						this.$refs.menutree.setCheckedKeys(res.data.menuCodes)
+					})
+				}
+			})
 		},
 		handleDetailRole(index, row){
+			this.roleDetail=null
 			let params={
 				roleCode:row.roleCode
 			}
 			api.querySysRoleDetailAPI(params).then(res=>{
-				// console.log('角色详情',res);
+				// // console.log('角色详情',res);
 				if(res.code==0){
 					this.roleDetail=res.data
 					this.dialogVisibleDetail=true
@@ -216,7 +320,7 @@ export default {
 		handleStartRole(index, row){},
 		//删除
 		handleDeleteRole(index, row) {
-			// console.log(row);
+			// // console.log(row);
 			this.$confirm('此操作将删除该角色, 是否继续?', '提示', {
 				confirmButtonText: '确定',
 				cancelButtonText: '取消',
@@ -249,45 +353,42 @@ export default {
 			
 		},
 		handleAddRole(){
-			this.roleDetail=null
+			this.form={
+				roleCode:'',
+				roleName:'',
+			  roleDesc: '',
+				menuCodes:[]
+			},
 			this.dialogVisible=true
+			this.$nextTick(()=>{
+				this.$refs.menutree.setCheckedKeys([])
+			})
 		},
-		//选中数据
-		handleSelectionChange(val) {
-			// console.log(val);
-		},
-		//按时间筛选
-		handleDateTime(val) {
-			// console.log(val);
-		},
+
+		
+
 		//搜索
 		handleSerach() {
 			let val = this.serachValue
 			this.querySysRoleByPage({pageNo:1,pageSize:this.pageSize,roleName:val})
 		},
-		//汇总统计
-		handleSummary() {},
-		//情况统计
-		handleHappen() {},
-		//创建考试
-		handleAdd() {
-			// this.$router.push('create_train');
-		},
+
+
 		//获取当前页
 		getCurrentPage(val) {
-			// console.log(val);
+			// // console.log(val);
 			this.querySysRoleByPage({pageNo:val,pageSize:this.pageSize})
 		},
 		//获取pagesize
 		getPageSize(val) {
-			// console.log(val);
+			// // console.log(val);
 			this.pageSize=val
 			this.querySysRoleByPage({pageNo:1,pageSize:val})
 		},
 		querySysRoleByPage(params){
 			this.loading=true
 			api.querySysRoleByPageAPI(params).then(res=>{
-				// console.log('角色列表',res);
+				// // console.log('角色列表',res);
 				this.roleList=res.data.records
 				this.total=parseInt(res.data.total)
 				this.loading=false
@@ -295,7 +396,7 @@ export default {
 		},
 		getSysMenuTree(){
 			api.getSysMenuTreeAPI().then(res=>{
-				// console.log('系统菜单',res);
+				// // console.log('系统菜单',res);
 				this.menu=res.data
 			})
 		},	

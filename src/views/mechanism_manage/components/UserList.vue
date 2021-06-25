@@ -27,7 +27,7 @@
 					>
 					<template slot-scope="scope">
 						<div class="block">
-							<el-avatar :size="large" :src="scope.row.avatar">
+							<el-avatar size="large" :src="scope.row.avatar">
 							</el-avatar>
 						</div>
 					</template>
@@ -110,9 +110,11 @@
 				this.$emit('handleUserRemove',row)
 			},
 			handleUserGroup(index,row){
+				row.isMaster=1
 				this.$emit('handleUserGroup',row)
 			},
 			handleEditUserCom(index,row){
+				row.isMaster=0
 				this.$emit('handleEditUserCom',row)
 			},
 			getPageSize(val){},

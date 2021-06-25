@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="m-auto">
 		<el-form ref="form" :model="form" :rules="rulesForm" label-width="100px">
 		  <el-form-item label="栏目名称" prop="title">
 		    <el-input type="text" v-model="form.title"></el-input>
@@ -100,7 +100,7 @@
 							secondTitle:this.form.secondTitle,
 							indx:this.form.indx,
 						}
-						// console.log(params);
+						// // console.log(params);
 						if(!this.form.id){
 							api.channelAddAPI(params).then(res=>{
 								if(res.code==0){
@@ -134,7 +134,7 @@
 						}
 						
 					} else {
-						console.log('error submit!!');
+						// console.log('error submit!!');
 						return false;
 					}
 				});
@@ -147,11 +147,11 @@
 			getCurrentPage(val){},
 			handleSelectionChange(){},
 			handleEdit(index,row){
-				// console.log(index,row);
+				// // console.log(index,row);
 				this.form.exam=row.name
 			},
 			handleNodeClick(data) {
-				// console.log(data);
+				// // console.log(data);
 				this.form.parentName=data.channelName
 				this.form.parentId=data.id
 			},
@@ -169,7 +169,7 @@
 			if(this.form.id){
 				api.channelDetailAPI({id:this.form.id}).then(res=>{
 					if(res.code==0){
-						// console.log('栏目详情',res);
+						// // console.log('栏目详情',res);
 						this.form.title=res.data.channelName
 						this.form.parentId=res.data.parentId
 						this.form.channelBgpic=res.data.channelBgpic

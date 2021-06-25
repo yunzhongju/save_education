@@ -2,7 +2,7 @@
 	<div class="in-animate">
 		<base-tabs @onBaseTabClick="onBaseTabClick" :baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
+				<div class="">
 					<el-row>
 						<el-col :span="12">
 							<div class="grid-content bg-purple">
@@ -163,7 +163,7 @@ export default {
 		},
 		//切换baseTabs
 		onBaseTabClick(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//编辑
 		handleEdit(index, row) {
@@ -201,7 +201,7 @@ export default {
 		},
 		//删除
 		handleDelete(index, row) {
-			// console.log(row);
+			// // console.log(row);
 			this.$confirm('此操作将删除该公告, 是否继续?', '提示', {
 				confirmButtonText: '确定',
 				cancelButtonText: '取消',
@@ -227,11 +227,11 @@ export default {
 		},
 		//选中数据
 		handleSelectionChange(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//按时间筛选
 		handleDateTime(val) {
-			// console.log(val);
+			// // console.log(val);
 		},
 		//搜索
 		handleSerach() {
@@ -261,7 +261,7 @@ export default {
 		noticeByPage(params){
 			this.loading=true
 			api.noticeByPageAPI(params).then(res=>{
-				// console.log('公告列表',res);
+				// // console.log('公告列表',res);
 				if(res.code==0){
 					this.list=res.data.records
 					this.total=res.data.total

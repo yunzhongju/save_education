@@ -29,6 +29,16 @@ const routes = [{
 				component: () => import('../views/user_manage/Index.vue') //角色管理
 			},
 			{
+				path: '/menu/statistics',
+				name: 'role_manage',
+				component: () => import('../views/staticies/Index.vue') //数据统计
+			},
+			{
+				path: '/menu/version',
+				name: 'version',
+				component: () => import('../views/versions/Index.vue') //版本管理
+			},
+			{
 				path: '/menu/mechanismManage',
 				name: 'mechanism_manage',
 				component: () => import('../views/mechanism_manage/Index.vue') //机构管理
@@ -66,9 +76,24 @@ const routes = [{
 				component: () => import('../views/online_examination/CreateExamination.vue') //创建考试计划
 			},
 			{
+				path: '/education/online_detail',
+				name: 'online_detail',
+				component: () => import('../views/online_examination/detail.vue') //考试计划详情
+			},
+			{
+				path: '/education/user_exam_detail',
+				name: 'user_exam_detail',
+				component: () => import('../views/online_examination/userExamDetail.vue') //用户考试详情
+			},
+			{
 				path: '/education/test_paper_manage',
 				name: 'test_paper_manage',
 				component: () => import('../views/test_paper_manage/Index.vue') //试卷管理
+			},
+			{
+				path: '/education/test_paper_detail',
+				name: 'test_paper_detail',
+				component: () => import('../views/test_paper_manage/detail.vue') //详情
 			},
 			{
 				path: '/education/create_test_paper',
@@ -155,9 +180,19 @@ const routes = [{
 				component: () => import('../views/attendance_manage/AttendanceGroup.vue') //考勤组
 			},
 			{
+				path: '/attendance/group_detail',
+				name: 'group_detail',
+				component: () => import('../views/attendance_manage/GrounpDetail.vue') //考勤组详情
+			},
+			{
 				path: '/attendance/attendance_record',
 				name: 'attendance_record',
 				component: () => import('../views/attendance_manage/AttendanceRecord.vue') //考勤记录
+			},
+			{
+				path: '/attendance/record',
+				name: 'record',
+				component: () => import('../views/attendance_manage/Record.vue') //记录
 			},
 		]
 	},
@@ -287,6 +322,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to,from,next)=>{
+	// // console.log(to,from);
 	if(!to.name) router.push('/404.html')
 	else next()
 })

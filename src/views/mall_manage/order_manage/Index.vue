@@ -32,6 +32,14 @@
 									搜索
 									</el-button>
 								</li>
+								<li class="marg-right30" v-if="status===1">
+									<el-button 
+										type="primary" 
+										size="mini" 
+										@click="handleAllOrder">
+									核销订单
+									</el-button>
+								</li>
 							</ul>
 						</div></el-col>
 					</el-row>
@@ -41,8 +49,13 @@
 								<el-table
 									:data="tableData"
 									border
+									@selection-change="handleSelectionChange"
 									height="660"
 									style="width: 100%">
+									<el-table-column
+										type="selection"
+										width="55">
+									</el-table-column>
 									<el-table-column
 										prop="orderCode"
 										align="center"
@@ -68,6 +81,10 @@
 										prop="completionTime"
 										align="center"
 										label="完成时间">
+										<template slot-scope="scope">
+											<span v-if="scope.row.completionTime">{{scope.row.completionTime}}</span>
+											<span v-else>未完成</span>
+										</template>
 									</el-table-column>
 									<el-table-column
 										prop="userName"
@@ -107,11 +124,25 @@
 <script>
 	import BaseTabs from '../../../components/BaseTabs.vue'
 	import BaseTable from '../../../components/BaseTable.vue'
-	import {queryOrderByPageAPI} from '../../../api/mall.js'
+	import {queryOrderByPageAPI,updateOrderCompleteAPI} from '../../../api/mall.js'
+	import {mapState} from 'vuex'
 	export default {
 		components:{
 			BaseTabs,
 			BaseTable
+		},
+		computed:{
+			...mapState({
+				user:s=>s.userInfo
+			}),
+			serachForm(){
+				return {
+					userMobile:this.serachValue,
+					pageNo:this.pageNo,
+					pageSize:this.pageSize,
+					status:this.status==-1?'':this.status
+				}
+			}
 		},
 		data(){
 			return {
@@ -121,30 +152,65 @@
 				pageSize:10,
 				pageNo:1,
 				baseTabs: [{label: '订单管理',value: '1'}],
-				tableData: []
+				tableData: [],
+				multipleSelection: []
 			}
 		},
 		methods:{
+			handleAllOrder(){
+				if(this.multipleSelection.length===0) return this.$message({type:'warning',message:'请选择订单'})
+				// console.log(this.multipleSelection);
+				 this.$confirm('是否完成选中订单?', '提示', {
+						confirmButtonText: '确定',
+						cancelButtonText: '取消',
+						type: 'warning'
+					}).then(() => {
+						let orderCodes=this.multipleSelection.map(v=>v.orderCode)
+						updateOrderCompleteAPI({orderCodes}).then(res=>{
+							this.getData()
+							this.$message({
+								type: 'success',
+								message: '成功!'
+							});
+						})
+					}).catch(() => {
+						this.$message({
+							type: 'info',
+							message: '已取消'
+						});          
+					});
+				
+			},
+			handleSelectionChange(val){
+				// console.log(val);
+				this.multipleSelection=val
+			},
 			onHandleChangeRadio(val){
-				let status=val==-1?'':val
-				this.queryOrderByPage({pageSize:this.pageSize,pageNo:this.pageNo,status:status})
+				this.pageNo=1
+				this.getData()
 			},
 			handleSerach(){
-				this.queryOrderByPage({pageSize:this.pageSize,pageNo:this.pageNo,userMobile:this.serachValue})
+				this.pageNo=1
+				this.getData()
 			},
 			getCurrentPage(page){
-				this.queryOrderByPage({pageSize:this.pageSize,pageNo:page,status:this.status})
+				this.pageNo=page
+				this.getData()
 			},
 			queryOrderByPage(params){
+				params.orgCode=this.user.projectDepartment
 				queryOrderByPageAPI(params).then(res=>{
-					// console.log(res);
+					// // console.log(res);
 					this.tableData=res.data.records
 					this.total=res.data.total
 				})
+			},
+			getData(){
+				this.queryOrderByPage(this.serachForm)
 			}
 		},
 		created() {
-			this.queryOrderByPage({pageSize:this.pageSize,pageNo:this.pageNo})
+			this.getData()
 		}
 	}
 </script>

@@ -31,7 +31,7 @@ export default {
 				key: '',
 				token: ''
 			},
-			qiniuaddr: 'http://education.quweiquwei.com/',
+			qiniuaddr: 'https://education.quweiquwei.com/',
 			img_url: ''
 		};
 	},
@@ -42,7 +42,7 @@ export default {
 				filePath:this.qiniuaddr+file.response.key,
 				fileName:file.name
 			}
-			// console.log('imgurl', file);
+			// // console.log('imgurl', file);
 			this.$emit('getfileUrl', this.img_url);
 			this.$emit('getfileobj',obj);
 			
@@ -53,7 +53,7 @@ export default {
 		},
 		getSimpleUpToken(){
 			api.getSimpleUpTokenAPI().then(res=>{
-				// console.log('token',res);
+				// // console.log('token',res);
 				if(res.code==0){
 					this.qn.token=res.data
 				}

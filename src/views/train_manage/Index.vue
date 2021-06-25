@@ -1,8 +1,8 @@
 <template>
 	<div class="in-animate">
-		<base-tabs @onBaseTabClick="onBaseTabClick" :baseTabs="baseTabs">
+		<base-tabs :baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
+				<div class="">
 					<el-row>
 						<el-col :span="24">
 							<div class="grid-content bg-purple-light">
@@ -12,13 +12,13 @@
 										placeholder="搜索培训名称" 
 										clearable 
 										suffix-icon="el-icon-search" 
-										v-model="serachValue"></el-input>
+										v-model="serachForm.context"></el-input>
 									</li>
 									<li class="marg-right30">
 										<el-button type="primary" 
 										size="mini" 
 										icon="el-icon-search" 
-										@click="handleSerach">搜索</el-button></li>
+										@click="getData">搜索</el-button></li>
 									<li class="marg-right30">
 										<el-button type="primary" 
 										size="mini" 
@@ -33,7 +33,6 @@
 							<div class="grid-content bg-purple-dark marg-top20">
 								<base-table 
 								:total="total" 
-								@getPageSize="getPageSize" 
 								@getCurrentPage="getCurrentPage">
 									<el-table 
 									ref="multipleTable" 
@@ -42,8 +41,7 @@
 									v-loading="loading"
 									tooltip-effect="dark" 
 									style="width: 100%;min-height: 650px;" 
-									max-height="650"
-									@selection-change="handleSelectionChange">
+									max-height="650">
 										<el-table-column
 											label="编号"
 											align="center"
@@ -118,9 +116,8 @@
 		<el-dialog
 		  title="详情"
 		  :visible.sync="dialogVisible"
-		  width="30%"
 			center
-		  :before-close="handleClose">
+		  :before-close="handleClose1">
 		  <span>
 				<base-detail
 					:detail="trainDetail"
@@ -132,10 +129,10 @@
 </template>
 
 <script>
-import BaseTabs from '../../components/BaseTabs.vue';
-import BaseTable from '../../components/BaseTable.vue';
+import BaseTabs from '@/components/BaseTabs.vue';
+import BaseTable from '@/components/BaseTable.vue';
 import BaseDetail from './components/BaseDetail.vue'
-import api from '../../api/api.js'
+import api from '@/api/api.js'
 export default {
 	components: {
 		BaseTabs,
@@ -157,21 +154,36 @@ export default {
 					value: '1'
 				}
 			],
+			serachForm:{
+				pageNo:1,
+				pageSize:10,
+				context:''
+			}
 		};
 	},
 	methods: {
-		handleClose(done){done()},
+		handleClose(done){
+			this.$confirm('确认关闭？')
+				.then(_ => {
+					done();
+				})
+				.catch(_ => {});
+		},
+		handleClose1(done){
+			done();
+		},
 		handleTrainDetail(index,row){
 			api.queryTrainPlanDetailAPI({id:row.id}).then(res=>{
-				// console.log('培训详情',res);
+				// // console.log('培训详情',res);
 				this.trainDetail=res.data
+				this.trainDetail.studentList=this.trainDetail.studentList.map(v=>{
+					v.studentName=v.userName
+					return v
+				})
 				this.dialogVisible=true
 			})
 		},
-		//切换baseTabs
-		onBaseTabClick(val) {
-			// console.log(val);
-		},
+
 		//编辑
 		handleEditTrain(index, row) {
 			this.$router.push({
@@ -181,11 +193,10 @@ export default {
 				}
 			});
 		},
-		//撤销
-		handleCancel(index, row){},
+
 		//删除
 		handleDeleteTrain(index, row) {
-			// console.log(row);
+			// // console.log(row);
 			this.$confirm('此操作将删除该培训, 是否继续?', '提示', {
 				confirmButtonText: '确定',
 				cancelButtonText: '取消',
@@ -194,12 +205,17 @@ export default {
 				.then(() => {
 					api.deleteTrainPlanAPI({id:row.id}).then(res=>{
 						if(res.code==0){
-							this.queryTrainPlanByPage({pageNo:1,pageSize:10})
+							this.getData()
 							this.$message({
 								type: 'success',
 								message: '删除成功!'
 							});
-						}
+						}else{
+								this.$message({
+									message:res.msg,
+									type:'warning'
+								})
+							}
 					})
 				})
 				.catch(() => {
@@ -209,22 +225,8 @@ export default {
 					});
 				});
 		},
-		//选中数据
-		handleSelectionChange(val) {
-			// console.log(val);
-		},
-		//按时间筛选
-		handleDateTime(val) {
-			// console.log(val);
-		},
-		//搜索
-		handleSerach() {
-			this.queryTrainPlanByPage({pageNo:1,pageSize:10,trainName:this.serachValue})
-		},
-		//汇总统计
-		handleSummary() {},
-		//情况统计
-		handleHappen() {},
+
+
 		//创建考试
 		handleAdd() {
 			this.$router.push({
@@ -236,26 +238,26 @@ export default {
 		},
 		//获取当前页
 		getCurrentPage(val) {
-			this.queryTrainPlanByPage({pageNo:val,pageSize:10})
+			this.serachForm.pageNo=val
+			this.getData()
 		},
-		//获取pagesize
-		getPageSize(val) {
-			this.queryTrainPlanByPage({pageNo:1,pageSize:val})
-		},
+
 		queryTrainPlanByPage(params){
 			this.loading=true
 			api.queryTrainPlanByPageAPI(params).then(res=>{
-				// console.log('培训列表',res);
-				if(res.code==0){
-					this.trainList=res.data.records
-					this.total=res.data.total
-					this.loading=false
-				}
+				// // console.log('培训列表',res);
+				this.trainList=res.data.records
+				this.total=res.data.total
+				this.loading=false
 			})
+		},
+		getData(){
+			this.queryTrainPlanByPage(this.serachForm)
 		}
 	},
 	created() {
-		this.queryTrainPlanByPage({pageNo:1,pageSize:10})
+		this.getData()
+		this.$store.commit('setUsers',[])
 	}
 };
 </script>

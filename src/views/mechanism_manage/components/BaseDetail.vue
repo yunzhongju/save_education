@@ -84,4 +84,29 @@ ul{
 	// 	flex: 1;
 	// }
 }
+.text {
+	    font-size: 14px;
+	  }
+		.show-history{
+			height: 700px;
+			overflow: auto;
+			display: flex;
+			justify-content: center;
+		}
+	  .item {
+	    margin-bottom: 18px;
+	  }
+	
+	  .clearfix:before,
+	  .clearfix:after {
+	    display: table;
+	    content: "";
+	  }
+	  .clearfix:after {
+	    clear: both
+	  }
+	
+	  .box-card {
+	    /* width: 480px; */
+	  }
 </style>

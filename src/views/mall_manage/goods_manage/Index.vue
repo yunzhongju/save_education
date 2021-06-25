@@ -8,24 +8,42 @@
 							<el-button-group>
 							  <el-button 
 									type="primary" 
+									:disabled="!isAdmin"
 									size="mini" @click="onHandleAddGoodsType">添加分类</el-button>
 							  <el-button 
 									type="primary" 
+									:disabled="!isAdmin"
 									size="mini" @click="onHandleEdiGoodsType">修改分类</el-button>
 							  <el-button 
 									type="primary" 
+									:disabled="!isAdmin"
 									size="mini" @click="onHandleDelGoodsType">删除分类</el-button>
 							</el-button-group>
 						</div></el-col>
 					  <el-col :span="12"><div class="grid-content bg-purple-dark">
 							<ul  class="flex-end">
+								<li class="marg-right30" v-if="isAdmin">
+								  <el-select 
+										size="mini" 
+										clearable 
+										@change="getData"
+										v-model="serachForm.orgCode" 
+										placeholder="请选择机构">
+								      <el-option
+								        v-for="item in orgList"
+								        :key="item.orgCode"
+								        :label="item.orgName"
+								        :value="item.orgCode">
+								      </el-option>
+								    </el-select>
+								</li>
 								<li class="marg-right30">
 								  <el-input
 									  size="mini"
 										placeholder="搜索商品名称"
 										clearable
 										suffix-icon="el-icon-search"
-										v-model="serachValue">
+										v-model="serachForm.goodsName">
 									</el-input>
 								</li>
 								<li class="marg-right30">
@@ -33,7 +51,7 @@
 										type="primary" 
 										size="mini" 
 										icon="el-icon-search"
-										@click="handleSearch">搜索
+										@click="getData">搜索
 									</el-button>
 								</li>
 								<li class="marg-right30">
@@ -131,9 +149,6 @@
 											<el-button 
 												type="text" 
 												@click="onHandleDelGoods(scope.row)">删除</el-button>
-											<!-- <el-button 
-												type="text" 
-												@click="onHandleGoodsImg(scope.row)">图片</el-button> -->
 										</template>
 									</el-table-column>
 								</el-table>
@@ -200,9 +215,10 @@
 </template>
 
 <script>
-	import BaseTabs from '../../../components/BaseTabs.vue'
-	import BaseTable from '../../../components/BaseTable.vue'
-	import UploadImg from '../../../components/BaseUploadImg.vue'
+	import BaseTabs from '@/components/BaseTabs.vue'
+	import BaseTable from '@/components/BaseTable.vue'
+	import UploadImg from '@/components/BaseUploadImg.vue'
+	import api from '@/api/api.js'
 	import {queryGoodsCategoryTreeAPI,
 					addGoodsCategoryAPI,
 					queryGoodsByPageAPI,
@@ -210,7 +226,7 @@
 					deleteGoodsAPI,
 					updateGoodsInvalidAPI,
 					updateGoodsEffectiveAPI,
-					deleteGoodsCategoryAPI} from '../../../api/mall.js'
+					deleteGoodsCategoryAPI} from '@/api/mall.js'
 	export default {
 		components:{
 			BaseTabs,
@@ -236,9 +252,24 @@
 				tableData: [],
 				options: [],
 				category:[],
+				goodsCategory:'',
+				serachForm:{
+					pageNo:1,
+					pageSize:10,
+					goodsName:'',
+					goodsCategory:'',
+					orgCode:''
+				},
+				orgList:[]
 				}
 		},
+		computed:{
+			isAdmin(){
+				return this.$store.state.userInfo.projectDepartment=='admin'?true:false
+			},
+		},
 		methods:{
+			// 上架商品
 			onHandleUpdateGoodsEffective(row){
 				updateGoodsEffectiveAPI({id:row.id}).then(res=>{
 					if(res.code===0){
@@ -246,7 +277,7 @@
 							type: 'success',
 							message: '上架成功'
 						});
-						this.queryGoodsByPage({pageNo:this.pageNo,pageSize:this.pageSize})
+						this.getData()
 					}else{
 						this.$message({
 							type: 'warning',
@@ -255,6 +286,7 @@
 					}
 				})
 			},
+			// 下架商品
 			onHandleUpdateGoodsInvalid(row){
 				this.$confirm('此操作将下架该商品, 是否继续?', '提示', {
 					confirmButtonText: '确定',
@@ -268,7 +300,7 @@
 								type: 'success',
 								message: '下架成功'
 							});
-							this.queryGoodsByPage({pageNo:this.pageNo,pageSize:this.pageSize})
+							this.getData()
 						}else{
 							this.$message({
 								type: 'warning',
@@ -284,6 +316,7 @@
 					});
 				});
 			},
+			//商品详情
 			onHandleGoodsDetail(row){
 				this.$router.push({
 					path:'goods_detail',
@@ -292,6 +325,7 @@
 					}
 				})
 			},
+			//删除商品
 			onHandleDelGoods(row){
 				this.$confirm('此操作将删除该商品, 是否继续?', '提示', {
 					confirmButtonText: '确定',
@@ -305,7 +339,7 @@
 								type: 'success',
 								message: '删除成功'
 							});
-							this.queryGoodsByPage({pageNo:this.pageNo,pageSize:this.pageSize})
+							this.getData()
 						}else{
 							this.$message({
 								type: 'warning',
@@ -321,19 +355,9 @@
 					});
 				});
 			},
-			onHandleGoodsImg(row){
-				this.$router.push({
-					path:'goods_images',
-					query:{
-						id:row.id
-					}
-				})
-			},
-			handleSearch(){
-				this.queryGoodsByPage({pageNo:this.pageNo,pageSize:this.pageSize,goodsName:this.serachValue})
-			},
 			getCurrentPage(page){
-				this.queryGoodsByPage({pageNo:page,pageSize:this.pageSize,goodsCategory:this.currentCategory.categoryCode,goodsName:this.serachValue})
+				this.serachForm.pageNo=page
+				this.getData()
 			},
 			getImgUrl(url){
 				this.goodsTypeForm.icon=url
@@ -407,7 +431,10 @@
 				this.dialogVisible=true
 			},
 			handleNodeClick(node){
-				// console.log(node);
+				// // console.log(node);
+				this.goodsCategory=node.categoryCode
+				this.serachForm.goodsCategory=node.categoryCode
+				this.pageNo=1
 				this.$message({
 					type:'success',
 					message:`已选中${node.categoryName}`
@@ -421,19 +448,23 @@
 				}else{
 					this.goodsTypeForm.parentCode.push(node.parentCode)
 				}
-				this.queryGoodsByPage({pageNo:this.pageNo,pageSize:this.pageSize,goodsCategory:node.categoryCode,goodsName:this.serachValue})
-				// console.log(this.goodsTypeForm);
+				this.getData()
+				// // console.log(this.goodsTypeForm);
 			},
 			handleClose(done){
-				this.goodsTypeForm.parentCode=[]
-				done()
+				this.$confirm('确认关闭？')
+					.then(_ => {
+						this.goodsTypeForm.parentCode=[]
+						done();
+					})
+					.catch(_ => {});
 			},
 			submitForm(formName) {
 				this.$refs[formName].validate((valid) => {
 					if (valid) {
 						let parentCode=this.goodsTypeForm.parentCode
 						this.goodsTypeForm.parentCode=parentCode.length!==0?parentCode[parentCode.length-1]:''
-						// console.log(this.goodsTypeForm);
+						// // console.log(this.goodsTypeForm);
 						if(!this.isEdit){
 							addGoodsCategoryAPI(this.goodsTypeForm).then(res=>{
 								if(res.code===0){
@@ -473,7 +504,7 @@
 						}
 						
 					} else {
-						// console.log('error submit!!');
+						// // console.log('error submit!!');
 						return false;
 					}
 				});
@@ -492,11 +523,24 @@
 					this.total=res.data.total
 					this.tableData=res.data.records
 				})
+			},
+			getData(){
+				this.queryGoodsByPage(this.serachForm)
+			},
+			getSysOrgTree(){
+				api.getSysOrgTreeAPI({}).then(res=>{
+					this.orgList=res.data[0].childrenOrg.map(v=>{
+						delete v.childrenOrg
+						return v
+					})
+					console.log(this.orgList);
+				})
 			}
 		},
 		created() {
 			this.queryGoodsCategoryTree()
-			this.queryGoodsByPage({pageNo:this.pageNo,pageSize:this.pageSize})
+			this.getSysOrgTree()
+			this.getData()
 		}
 	}
 </script>

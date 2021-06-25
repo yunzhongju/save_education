@@ -15,25 +15,16 @@
 			</el-row>
 			<el-row :gutter="20">
 			  <el-col :span="12"><div class="grid-content bg-purple">
-			  	<el-form-item label="签到开始时间:">
-			  		<span>{{detail.signInStartTime }}</span>
+			  	<el-form-item label="时间:">
+			  		<!-- <span>{{detail.signInStartTime }}</span> -->
+						<div v-for="(item,index) in detail.attendanceTimes">
+							<span>{{item.signInStartTime}}---{{item.signInEndTime}}</span>
+						</div>
 			  	</el-form-item>
 			  </div></el-col>
-			  <el-col :span="12"><div class="grid-content bg-purple">
-					<el-form-item label="签到结束时间:">
-						<span>{{ detail.signInEndTime }}</span>
-					</el-form-item>
-				</div></el-col>
-			</el-row>
-			<el-row :gutter="20">
-			  <el-col :span="12"><div class="grid-content bg-purple">
-			  	<el-form-item label="签退开始时间:">
-			  		<span>{{detail.signOutStartTime }}</span>
-			  	</el-form-item>
-			  </div></el-col>
-			  <el-col :span="12"><div class="grid-content bg-purple">
-					<el-form-item label="签退结束时间:">
-						<span>{{ detail.signOutEndTime }}</span>
+				<el-col :span="12"><div class="grid-content bg-purple">
+					<el-form-item label="签到范围:">
+						<span>{{ detail.attendanceRange }}km</span>
 					</el-form-item>
 				</div></el-col>
 			</el-row>
@@ -43,9 +34,9 @@
 			  		<span>{{detail.attendanceGis }}</span>
 			  	</el-form-item>
 			  </div></el-col>
-			  <el-col :span="12"><div class="grid-content bg-purple">
-					<el-form-item label="签到范围:">
-						<span>{{ detail.attendanceRange }}km</span>
+				<el-col :span="12"><div class="grid-content bg-purple">
+					<el-form-item label="创建时间:">
+						<span>{{ detail.createTime }}</span>
 					</el-form-item>
 				</div></el-col>
 			</el-row>
@@ -53,11 +44,6 @@
 				<el-col :span="12"><div class="grid-content bg-purple">
 					<el-form-item label="更新时间:">
 						<span>{{detail.updateTime }}</span>
-					</el-form-item>
-				</div></el-col>
-			  <el-col :span="12"><div class="grid-content bg-purple">
-					<el-form-item label="创建时间:">
-						<span>{{ detail.createTime }}</span>
 					</el-form-item>
 				</div></el-col>
 			</el-row>

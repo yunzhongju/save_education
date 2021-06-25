@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="m-auto">
 		<el-form ref="form" :model="form" :rules="rulesForm" label-width="100px">
 		  <el-form-item label="图书名称" prop="bookName">
 		    <el-input type="text" v-model="form.bookName"></el-input>
@@ -34,6 +34,7 @@
 				<upload-img 
 					@getImgUrl="getImgUrl" 
 					:url="form.cover"></upload-img>
+				<img :src="form.cover" style="height: 180px;width: 360px;" alt="">
 			</el-form-item>
 			<el-form-item label="图书类容" prop="bookUrl">  
 			<upload-file @getfileUrl="getfileUrl"></upload-file>
@@ -125,7 +126,7 @@
 						}else{
 							params['id']=this.form.id
 							params['bookCode']=this.form.bookCode
-							// console.log(params);
+							// // console.log(params);
 							api.updateBookAPI(params).then(res=>{
 								if(res.code==0){
 									this.$message({
@@ -142,7 +143,7 @@
 							})
 						}
 					} else {
-						console.log('error submit!!');
+						// console.log('error submit!!');
 						return false;
 					}
 				});
@@ -155,16 +156,15 @@
 			getCurrentPage(val){},
 			handleSelectionChange(){},
 			handleEdit(index,row){
-				// console.log(index,row);
+				// // console.log(index,row);
 				this.form.exam=row.name
 			},
 			handleNodeClick(data) {
 				this.form.type=data.label
-				// console.log(data);
+				// // console.log(data);
 			},
 			queryBookTypeList(){
 				api.queryBookTypeListAPI().then(res=>{
-					// console.log('图示分类列表',res);
 					if(res.code==0){
 						this.bookTypeList=res.data
 					}
@@ -176,7 +176,7 @@
 			this.bookCode=this.$route.query.bookCode
 			if(this.bookCode){
 				api.queryBookDetailAPI({bookCode:this.bookCode}).then(res=>{
-					// console.log('书籍详情',res);
+					// // console.log('书籍详情',res);
 					if(res.code==0){
 						this.bookDetail=res.data
 						this.form.id=res.data.id

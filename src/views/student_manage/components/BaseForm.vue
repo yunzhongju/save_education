@@ -92,7 +92,7 @@
 							mobileNo:this.form.mobileNo,
 							orgCode:this.form.orgCode,
 						}
-						// console.log(params);
+						// // console.log(params);
 						if(!this.form.id){
 							api.addStudentAPI(params).then(res=>{
 								if(res.code==0){

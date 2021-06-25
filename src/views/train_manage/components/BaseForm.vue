@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="m-auto">
 		<el-form ref="form" :model="form" :rules="rulesForm" label-width="100px">
 		  <el-form-item label="培训标题" prop="trainName">
 		    <el-input v-model="form.trainName"></el-input>
@@ -8,7 +8,7 @@
 			 <el-input v-model="form.remark" type="textarea"></el-input>
 			</el-form-item>
 			<el-form-item label="培训地点" prop="trainAddress">
-			 <el-input v-model="form.trainAddress" type="textarea"></el-input>
+			 <el-input v-model="form.trainAddress"></el-input>
 			</el-form-item>
 			<el-form-item label="培训时间" prop="time">
 				<el-date-picker
@@ -21,10 +21,13 @@
 				</el-date-picker>
 			</el-form-item>
 			<el-form-item label="培训封面" prop="trainImag">
-				<upload-img @getImgUrl="getImgUrl" :url="trainDetail?trainDetail.trainImag:''"></upload-img>
+				<upload-img @getImgUrl="getImgUrl"></upload-img>
+				<img :src="form.trainImag" style="height: 180px;width: 360px;" alt="">
 			</el-form-item>
 			<el-form-item label="培训人员" prop="userCodeList">
-			 <base-transfer @getUserList="getUserList" :leftList="form.userCodeList"></base-transfer>
+			 <!-- <base-transfer @getUserList="getUserList" :leftList="form.userCodeList"></base-transfer> -->
+			 
+			 
 			</el-form-item>
 			<el-form-item label="培训附件" prop="fileUrl">
 				<el-row>
@@ -48,14 +51,15 @@
 	import BaseTable from '../../../components/BaseTable.vue'
 	import UploadFile from '../../../components/BaseUploadFile.vue'
 	import BaseTransfer from '../../../components/BaseTransfer.vue'
-	import UploadImg from '../../../components/BaseUploadImg.vue'
+	import SelectUser from '../../../components/SelectUser.vue'
 	import api from '../../../api/api.js'
   export default {
 		components:{
 			BaseTable,
 			UploadFile,
 			BaseTransfer,
-			UploadImg
+			UploadImg,
+			SelectUser
 		},
     data() {
 		let	validateTime=(rule,value,callback)=>{
@@ -86,8 +90,7 @@
 					 trainImag: [{ required: true, message: '请上传培训封面', trigger: 'blur' }],
 					 trainAddress: [{ required: true, message: '请输入培训地点', trigger: 'change' }],
 					 remark: [{ required: true, message: '请输入培训描述', trigger: 'blur' }],
-					 time: [{ required: true, message: '请选择时间', trigger: 'blur' },
-					 { validator: validateTime, trigger: 'blur' }],
+					 time: [{ required: true, message: '请选择时间', trigger: 'blur' }],
 					 fileUrl: [{ required: true, message: '请上传培训附件', trigger: 'blur' }],
 					 userCodeList: [{ required: true, message: '请选择培训人员', trigger: 'blur' }],
 				},
@@ -133,7 +136,7 @@
 							})
 						}else{
 							params['trainCode']=this.trainDetail.trainCode
-							params['studentList']=this.trainDetail.studentList
+							// params['studentList']=this.trainDetail.studentList
 							api.updateTrainPlanAPI(params).then(res=>{
 								if(res.code==0){
 									this.$message({
@@ -150,14 +153,14 @@
 							})
 						}	
 					} else {
-						// console.log('error submit!!');
+						// console.log(this.form);
 						return false;
 					}
 				});
       },
 			resetForm(formName) {
 				this.$refs[formName].resetFields();
-				this.$router.go(-1)
+				this.$router.push('/education/train_manage')
 			},
 			getPageSize(val){},
 			getCurrentPage(val){},
@@ -184,8 +187,20 @@
 					this.form.trainImag=res.data.trainImag
 					this.form.fileUrl=res.data.fileUrl
 					this.form.userCodeList=this.handleUserList(res.data.studentList)
+					this.$store.commit('setUsers',res.data.studentList)
 				})
+			}else{
+				this.$store.commit('setUsers',[])
 			}
 		}
   }
 </script>
+<style scoped>
+	.postion{
+		height: 180px;
+		width: 360px;
+		position: fixed;
+		top: 0;
+		left: 0;
+	}
+</style>

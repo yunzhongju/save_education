@@ -22,7 +22,7 @@ export default {
 
 			// var myChart = this.$echarts.init(document.getElementById('myEcharts'));
 			let myChart = echarts.init(document.getElementById('myEcharts'));
-			// console.log(myChart);
+			// // console.log(myChart);
 			// 指定图表的配置项和数据
 			let data = this.data
 
@@ -199,7 +199,7 @@ export default {
 				myChart.resize();
 			};
 			/* this.myChart.on('click', function(res) {
-				console.log(res);
+				// console.log(res);
 			}); */
 		}
 	},

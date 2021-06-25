@@ -30,11 +30,11 @@
 									size="mini" 
 									icon="el-icon-search"
 									@click="handleSerach">搜索</el-button></li>
-									<li class="marg-right30">
-										<el-button type="primary" 
-										size="mini" 
-										icon="el-icon-refresh-right"
-										@click="$router.go(-1)">返回</el-button></li>
+								<li class="marg-right30">
+									<el-button type="primary" 
+									size="mini" 
+									icon="el-icon-refresh-right"
+									@click="$router.go(-1)">返回</el-button></li>
 							</ul>
 						</div>
 					</el-col>
@@ -85,24 +85,19 @@
 								align="center" 
 								show-overflow-tooltip></el-table-column>
 								<el-table-column
-								prop="signOutTime" 
-								label="签退时间" 
-								align="center" 
-								show-overflow-tooltip></el-table-column>
-								<el-table-column
-								prop="signOutGis" 
+								prop="signInGis" 
 								label="经纬度" 
 								align="center" 
 								show-overflow-tooltip></el-table-column>
-								<el-table-column
+							<!-- 	<el-table-column
 								prop="" 
 								label="状态" 
 								align="center" 
 								show-overflow-tooltip>
 									<template slot-scope="scope">
-										<span>{{scope.row.attendanceStatus==1?'正常':'异常'}}</span>
+										<span>{{scope.row.attendanceStatus?'异常':'正常'}}</span>
 									</template>
-								</el-table-column>
+								</el-table-column> -->
 							</el-table>
 						</base-table>
 					</div></el-col>
@@ -126,6 +121,7 @@
 				dateTimer:null,
 				serachValue:'',
 				id:null,
+				orgCode:null,
 				total:0,
 				loading:false,
 				tableData:[],
@@ -134,15 +130,31 @@
 				pageSize:10
 			}
 		},
+		computed:{
+			serachForm(){
+				return {
+					pageNo:this.pageNo,
+					pageSize:this.pageSize,
+					attendanceDate:this.dateTimer,
+					userName:this.serachValue,
+					attendanceGroup:this.id,
+					orgCode:this.orgCode
+				}
+			}
+		},
 		methods:{
 			getCurrentPage(page){
-				this.attendanceRecoedPage({attendanceGroup:this.id,pageNo:page,pageSize:this.pageSize})
+				this.pageNo=page
+				this.getData()
 			},
 			handleDateTime(val){
-				this.attendanceRecoedPage({attendanceGroup:this.id,pageNo:this.pageNo,pageSize:this.pageSize,attendanceDate:val})
+				this.dateTimer=val
+				this.pageNo=1
+				this.getData()
 			},
 			handleSerach(){
-				this.attendanceRecoedPage({attendanceGroup:this.id,pageNo:this.pageNo,pageSize:this.pageSize,userName:this.serachValue})
+				this.pageNo=1
+				this.getData()
 			},
 			onBaseTabClick(){},
 			getPageSize(val){
@@ -152,18 +164,23 @@
 				this.loading=true
 				api.attendanceRecoedPageAPI(params).then(res=>{
 					if(res.code==0){
-						// console.log(res);
+						// // console.log(res);
 						this.tableData=res.data.records
 						this.total=res.data.total
 						this.loading=false
 					}
 				})
+			},
+			getData(){
+				this.attendanceRecoedPage(this.serachForm)
 			}
 		},
 		created() {
+			console.log(this.$route.query);
 			this.id=this.$route.query.id
-			if(this.id){
-				this.attendanceRecoedPage({attendanceGroup:this.id,pageNo:this.pageNo,pageSize:this.pageSize})
+			this.orgCode=this.$route.query.orgCode
+			if(this.id||this.orgCode){
+				this.getData()
 			}
 		}
 	}

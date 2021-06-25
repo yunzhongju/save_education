@@ -80,6 +80,10 @@ export const queryGoodsPicByPageAPI = data => {
 export const queryOrderByPageAPI = data => {
 	return httpRequest('/queryOrderByPage.do', data, 1)
 }
+// 完成订单
+export const updateOrderCompleteAPI = data => {
+	return httpRequest('/updateOrderComplete.do', data, 1)
+}
 // 查询订单详情
 export const queryOrderDetailAPI = data => {
 	return httpRequest('/queryOrderDetail.do', data, 1)

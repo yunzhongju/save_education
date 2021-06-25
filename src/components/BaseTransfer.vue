@@ -16,6 +16,7 @@
 			>
 				<span slot-scope="{ option }">{{ option.userName }}</span>
 				<el-cascader
+					ref='cascader'
 					:options="orgList"
 					:show-all-levels="false"
 					slot="left-footer" 
@@ -42,13 +43,18 @@ export default {
 	created() {
 		this.getSysOrgTree()
 		// this.queryStudentList({pageNo:1,pageSize:100,orgType:0})
-		this.getUserList({})
+		if(typeof this.orgCode =='boolean'){
+			this.getUserList({})
+		}else{
+			this.getUserList({orgCode:this.orgCode,orgType:this.orgType})
+		}
 	},
 	data() {
 		return {
 			chooseUsers:[],
 			department:'',
 			orgList:[],
+			orgType:0,
 			userList:[],
 			props:{
 				key:'userCode',
@@ -64,12 +70,23 @@ export default {
 			}
 		};
 	},
+	computed:{
+		orgCode(){
+			return this.$store.state.userInfo.projectDepartment=='admin'?true:this.$store.state.userInfo.projectDepartment
+		}
+	},
 	methods: {
 		handleChooseOrg(org){
-			console.log(org)
-			let code=org[org.length-1]
-			// this.queryStudentList({pageNo:1,pageSize:100,orgCode:code,orgType:0})
-			this.getUserList({orgCode:code})
+			if(org.length!==0){
+				let code=org[org.length-1]
+				this.getUserList({orgCode:code,orgType:this.orgType})
+			}else{
+				if(typeof this.orgCode =='boolean'){
+					this.getUserList({})
+				}else{
+					this.getUserList({orgCode:this.orgCode,orgType:this.orgType})
+				}
+			}
 		},
 		handleChange(value, direction, movedKeys) {
 			this.$emit('getUserList',value)
@@ -80,9 +97,21 @@ export default {
 	getSysOrgTree(){
 		api.getSysOrgTreeAPI().then(res=>{
 			if(res.code==0){
-				// console.log('机构列表',res);
-				this.orgList=res.data
+				// // console.log('机构列表',res);
+				if(typeof this.orgCode=='boolean'){
+					this.orgList=res.data
+				}else{
+					this._handleOrgList(res.data)
+					this.orgList=res.data
+				}
 			}
+		})
+	},
+	_handleOrgList(arr){
+		arr.forEach(item=>{
+			item.childrenOrg=item.childrenOrg.filter(each=>{
+				return each.orgCode==this.orgCode
+			})
 		})
 	},
 		queryStudentList(params){
@@ -90,22 +119,17 @@ export default {
 				params['orgCode']=''
 			}
 			api.querySysUserByPageAPI(params).then(res=>{
-				console.log('学员列表',res);
+				// console.log('学员列表',res);
 				if(res.code==0){
 					this.userList=res.data.records
 				}
 			})
 		},
 		getUserList(params){
-			// console.log(11111111111111111111)
+			// // console.log(11111111111111111111)
 			api.getUserListAPI(params).then(res=>{
 				if(res.code==0){
 					this.userList=res.data
-				}else{
-					this.$message({
-						type:'warning',
-						message:res.msg
-					})
 				}
 			})
 		}

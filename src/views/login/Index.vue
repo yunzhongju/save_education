@@ -4,29 +4,29 @@
 			<h1>安全教育云平台</h1>
 			<div>
 				<el-form :model="form" :rules="rules" ref="form">
-					<el-form-item label="" prop="username">
+					<el-form-item label="" prop="account">
 						<el-input 
 							placeholder="请输入账号" 
-							v-model="form.username" 
+							v-model="form.account" 
 							clearable 
 							prefix-icon="el-icon-user-solid"></el-input>
 					</el-form-item>
-					<el-form-item label="" prop="password">
+					<el-form-item label="" prop="passWord">
 						<el-input 
 							placeholder="请输入密码" 
 							clearable 
-							v-model="form.password" 
+							v-model="form.passWord" 
 							show-password 
 							prefix-icon="el-icon-lock"></el-input>
 					</el-form-item>
-					<el-form-item label="" prop="code">
+					<el-form-item label="" prop="verifyCode">
 						<el-row :gutter="30">
 							<el-col :span="12">
 								<div class="grid-content bg-purple">
 									<el-input 
 										placeholder="请输入验证码" 
 										@keyup.enter.native="submitForm('form')"
-										v-model="form.code" clearable></el-input>
+										v-model="form.verifyCode" clearable></el-input>
 								</div>
 							</el-col>
 							<el-col :span="10">
@@ -56,14 +56,15 @@ export default {
 			verifyCodeIO: '',
 			verifyCodeId: '',
 			form: {
-				username: '',
-				password: '',
-				code: ''
+				account: '',
+				passWord: '',
+				verifyCode: '',
+				verifyCodeId:''
 			},
 			rules: {
-				username: [{ required: true, message: '请输入账号', trigger: 'blur' }],
-				password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-				code: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
+				account: [{ required: true, message: '请输入账号', trigger: 'blur' }],
+				passWord: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+				verifyCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
 			}
 		};
 	},
@@ -71,19 +72,15 @@ export default {
 		submitForm(formName) {
 			this.$refs[formName].validate(valid => {
 				if (valid) {
-					let params = {
-						'account': this.form.username,
-						'passWord': this.form.password,
-						'verifyCodeId': this.verifyCodeId,
-						'verifyCode': this.form.code
-					};
-					api.loginAPI(params).then(res => {
+					api.loginAPI(this.form).then(res => {
 						if (res.code === 0) {
 							localStorage.setItem('user_info',JSON.stringify(res.data))
+							this.$store.commit('setUserInfo',res.data)
 							this.$message({
 								type: 'success',
 								message: '登陆成功'
 							});
+							this.loading=false
 							this.$router.push('home');
 						} else {
 							this.$message({
@@ -105,7 +102,7 @@ export default {
 			api.getVerificationCodeAPI().then(res => {
 				if (res.code === 0) {
 					this.verifyCodeIO = res.data.verifyCodeIO;
-					this.verifyCodeId = res.data.verifyCodeId;
+					this.form.verifyCodeId = res.data.verifyCodeId;
 				} else {
 					this.$message({
 						type: 'error',

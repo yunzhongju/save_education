@@ -81,7 +81,7 @@
 		created() {
 			this.id=this.$route.query.id
 			api.newsDetailAPI({id:this.id}).then(res=>{
-				// console.log('资讯详情',res);
+				// // console.log('资讯详情',res);
 				this.detail=res.data
 			})
 		}

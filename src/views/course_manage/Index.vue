@@ -1,18 +1,29 @@
 <template>
 	<div class="in-animate">
 		<base-tabs
-		@onBaseTabClick="onBaseTabClick"
 		:baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
+				<div class="">
 					<el-row>
 					  <el-col :span="24"><div class="grid-content bg-purple-light">
 							<el-row>
 								<el-col :span="12"><div class="grid-content bg-purple">
-									<el-button-group>
-									  <el-button type="primary" size="mini" @click="handleAddCourseType">添加分类</el-button>
-									  <el-button type="primary" size="mini" @click="handleEditCourseType">修改分类</el-button>
-									  <el-button type="primary" size="mini" @click="handleDeleteCourseType">删除分类</el-button>
+									<el-button-group >
+									  <el-button 
+											type="primary" 
+											size="mini" 
+											:disabled="!isAdmin"
+											@click="handleAddCourseType">添加分类</el-button>
+									  <el-button 
+											type="primary" 
+											size="mini" 
+											:disabled="!isAdmin"
+											@click="handleEditCourseType">修改分类</el-button>
+									  <el-button 
+											type="primary" 
+											size="mini" 
+											:disabled="!isAdmin"
+											@click="handleDeleteCourseType">删除分类</el-button>
 									</el-button-group>
 								</div></el-col>
 							  <el-col :span="12"><div class="grid-content bg-purple-dark">
@@ -23,7 +34,7 @@
 												placeholder="搜索课程名称"
 												clearable
 												suffix-icon="el-icon-search"
-												v-model="serachValue">
+												v-model="serachFrom.context">
 											</el-input>
 										</li>
 										<li class="marg-right30">
@@ -31,8 +42,7 @@
 												type="primary" 
 												size="mini" 
 												icon="el-icon-search" 
-												@click="handleSerach"
-												>
+												@click="getList">
 											搜索
 											</el-button>
 										</li>
@@ -58,7 +68,6 @@
 							  <el-col :span="21"><div class="grid-content bg-purple-dark">
 									<base-table
 									:total="total"
-									@getPageSize="getPageSize"
 									@getCurrentPage="getCurrentPage"
 									>
 										<el-table
@@ -68,8 +77,7 @@
 											v-loading="loading"
 											tooltip-effect="dark"
 											height="650"
-											max-height="650"
-											@selection-change="handleSelectionChange">
+											max-height="650">
 											<el-table-column
 												label="编号"
 												align="center"
@@ -150,50 +158,18 @@
 				</div>
 			</template>
 		</base-tabs>
-		
-		<!-- 章节对话框 -->
-		<el-dialog
-		  title="章节"
-		  :visible.sync="dialogVisible"
-		  width="30%"
-			center
-		  :before-close="handleClose">
-		  <span>
-				<base-section
-				 @handleDetailSecton="handleDetailSecton"
-				 @handleSection="handleSection"
-					:courseCode="courseCode"
-					:courseName="courseName"
-					:courseSectionList="courseSectionList"></base-section>
-			</span>
-		</el-dialog>
-		
-		
+
 		<!-- 课程详情对话框 -->
 		<el-dialog
 		  title="详情"
 		  :visible.sync="dialogVisibleDetail"
 		  width="50%"
 			center
-		  :before-close="handleClose">
+		  :before-close="handleClose1">
 		  <span>
 				<base-detail
 					:detail="courseDetail"
 				></base-detail>
-			</span>
-		</el-dialog>
-		
-		<!-- 章节详情对话框 -->
-		<el-dialog
-		  title="详情"
-		  :visible.sync="dialogVisibleDetailSection"
-		  width="40%"
-			center
-		  :before-close="handleClose">
-		  <span>
-				<base-details
-					:detail="currentSection"
-				></base-details>
 			</span>
 		</el-dialog>
 		
@@ -203,7 +179,7 @@
 		  :visible.sync="dialogVisibleCourseType"
 			center
 			v-if="dialogVisibleCourseType"
-		  :before-close="handleCloseCourseType">
+		  :before-close="handleClose">
 		  <span>
 				<ClassForm
 				  :detail="currentCourseType"
@@ -219,15 +195,15 @@
 
 <script>
 	import BaseSection from './components/BaseSection.vue'
-	import BaseTabs from '../../components/BaseTabs.vue';
-	import BaseTable from '../../components/BaseTable.vue'
+	import BaseTabs from '@/components/BaseTabs.vue';
+	import BaseTable from '@/components/BaseTable.vue'
 	import BaseClassification from './components/BaseClassification.vue'
 	import ClassForm from './components/BaseClassificationForm.vue'
 	import BaseCourse from './components/BaseCourseList.vue'
 	import BaseDetail from './components/BaseDetail.vue'
 	import BaseDetails from './components/BaseSDetail.vue'
-	import api from '../../api/api.js'
-	import {bus} from '../../utils/bus.js'
+	import api from '@/api/api.js'
+	import {bus} from '@/utils/bus.js'
 	export default {
 		components:{
 			BaseTabs,
@@ -242,7 +218,6 @@
 		data(){
 			return {
 				loading:false,
-				dialogVisibleDetailSection:false,
 				currentCourseType:null,
 				dialogVisibleCourseType:false,
 				dialogVisibleDetail:false,
@@ -257,15 +232,20 @@
 				courseCode:null,
 				serachValue:'',
 				baseTabs:[{label: '课程管理',value: '1'}],
+				serachFrom:{
+					pageNo:1,
+					pageSize:10,
+					courseType:'',
+					context:''
+				}
+			}
+		},
+		computed:{
+			isAdmin(){
+				return this.$store.state.userInfo.projectDepartment=='admin'?true:false
 			}
 		},
 		methods:{
-			handleDetailSecton(node){
-				// console.log('章节详情',node);
-				this.currentSection=node
-				this.dialogVisible=false
-				this.dialogVisibleDetailSection=true
-			},
 			handleSection(node){
 				this.dialogVisible=false
 			},
@@ -300,6 +280,11 @@
 									message:'删除成功',
 									type:'success'
 								})
+							}else{
+								this.$message({
+									message:res.msg,
+									type:'warning'
+								})
 							}
 						})
 					}).catch(() => {
@@ -332,7 +317,7 @@
 							type: 'success',
 							message: '上架成功!'
 						});
-						this.queryCourseByPage({pageNo:1,pageSize:10})
+						this.getList()
 					}
 				})
 			},
@@ -348,7 +333,7 @@
 								type: 'success',
 								message: '下架成功!'
 							});
-							this.queryCourseByPage({pageNo:1,pageSize:10})
+							this.getList()
 						}
 					})
 				}).catch(() => {
@@ -362,7 +347,16 @@
 				this.courseDetail=this.courseList.filter(item=>item.id==row.id)[0]
 				this.dialogVisibleDetail=true
 			},
-			handleClose(done){done()},
+			handleClose(done){
+				this.$confirm('确认关闭？')
+					.then(_ => {
+						done();
+					})
+					.catch(_ => {});
+			},
+			handleClose1(done){
+				done();
+			},
 			handleCourseSectionTree(index,row){
 				this.$router.push({
 					path:'section_manage',
@@ -373,13 +367,10 @@
 				})
 			},
 			handleNodeClick(node){
+				this.serachFrom.pageNo=1
 				this.currentCourseType=node
-				let courseCode=node.courseType
-				this.queryCourseByPage({pageNo:1,pageSize:10,courseType:courseCode})
-			},
-			onBaseTabClick(){},
-			handleSerach(){
-				this.queryCourseByPage({pageNo:1,pageSize:10,context:this.serachValue})
+				this.serachFrom.courseType=node.courseType
+				this.getList()
 			},
 			handleEditCourse(index,row){
 				let course=this.courseList.filter(item=>item.id==row.id)[0]
@@ -389,55 +380,36 @@
 			handleAdd(){
 				this.$router.push({path:'create_course',query:{id:null}})
 			},
-			getPageSize(val){
-				this.queryCourseByPage({pageNo:1,pageSize:val})
-			},
 			getCurrentPage(val){
-				this.queryCourseByPage({pageNo:val,pageSize:10})
-			},
-			handleSelectionChange(){},
-			handleComment(index,row){},
-			handleEdit(index,row){},
-			handleDelete(index,row){
-				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-					confirmButtonText: '确定',
-					cancelButtonText: '取消',
-					type: 'warning'
-				}).then(() => {
-					this.$message({
-						type: 'success',
-						message: '删除成功!'
-					});
-				}).catch(() => {
-					this.$message({
-						type: 'info',
-						message: '已取消删除'
-					});          
-				});
+				this.serachFrom.pageNo=val
+				this.getList()
 			},
 			queryCourseByPage(params){
 				this.loading=true
 				api.queryCourseByPageAPI(params).then(res=>{
-					// console.log('课程列表',res);
-					if(res.code==0){
-						this.courseList=res.data.records
-						this.total=res.data.total
-						this.loading=false
-					}
+					// // console.log('课程列表',res);
+					this.courseList=res.data.records
+					this.total=res.data.total
+					this.loading=false
 				})
 			},
 			queryCourseTypeList(params){
 				api.queryCourseTypeListAPI(params).then(res=>{
-					// console.log('课程分类列表',res);
-					if(res.code==0){
-						this.courseTypeList=res.data
-					}
+					console.log('课程分类列表',res);
+					this.courseTypeList=res.data
+					this.courseTypeList.unshift({
+						courseTypeName:'全部',
+						courseType:''
+					})
 				})
+			},
+			getList(){
+				this.queryCourseByPage(this.serachFrom)
 			}
 		},
 		created() {
-			this.queryCourseByPage({pageNo:1,pageSize:10})
 			this.queryCourseTypeList()
+			this.getList()
 		}
 	}
 </script>

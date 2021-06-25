@@ -70,7 +70,7 @@ export default {
 		},
 		GDinit(o, self) {
 			o.getCurrentPosition((status, result) => {
-				// console.log(status, result);
+				// // console.log(status, result);
 				if (status === 'complete' && result.info === 'SUCCESS') {
 					let lat = result.position.lat;
 					let lng = result.position.lng;

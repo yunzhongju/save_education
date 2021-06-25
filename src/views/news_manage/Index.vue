@@ -4,8 +4,7 @@
 		@onBaseTabClick="onBaseTabClick"
 		:baseTabs="baseTabs">
 			<template v-slot:1>
-				<div class="container">
-					<el-row>
+				<div class=""l-row>
 					  <el-col :span="24"><div class="grid-content bg-purple-light">
 							<el-row>
 								<el-col :span="12"><div class="grid-content bg-purple">
@@ -322,7 +321,7 @@
 			},
 			handleApproveList(index,row){
 				api.queryApproveRecordAPI({contentId:row.id}).then(res=>{
-					// console.log(res);
+					// // console.log(res);
 					if(res.code==0){
 						this.dialogTableVisible=true
 						this.approveList=res.data
@@ -346,7 +345,13 @@
 				this.dialogVisible=true
 				this.id=row.id
 			},
-			handleClose(done){done()},
+			handleClose(done){
+				this.$confirm('确认关闭？')
+					.then(_ => {
+						done();
+					})
+					.catch(_ => {});
+			},
 			handleChooseApprove(val){
 				this.newsPage({pageNo:1,pageSize:10,approve:val})
 			},
@@ -411,7 +416,7 @@
 			newsPage(params){
 				this.loading=true
 				api.newsPageAPI(params).then(res=>{
-					// console.log('资讯列表',res);
+					// // console.log('资讯列表',res);
 					if(res.code==0){
 						this.newsList=res.data.records
 						this.total=res.data.total
@@ -421,7 +426,7 @@
 			},
 			channelPage(params){
 				api.channelPageAPI(params).then(res=>{
-					// console.log('栏目',res);
+					// // console.log('栏目',res);
 					if(res.code==0){
 						this.currentChannel=null
 						this.channelList=res.data

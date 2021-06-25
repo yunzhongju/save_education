@@ -11,7 +11,7 @@
 										type="primary" 
 										size="mini" 
 										icon="el-icon-refresh-left" 
-										@click="$router.go(-1)"
+										@click="$router.push('/mall/goods_manage')"
 										>
 									返回
 									</el-button>
@@ -52,21 +52,34 @@
 									</el-form-item>
 									<el-form-item
 									  label="商品分类"
+										v-if="id && goodsForm.goodsCategory.length!==0"
 									  prop="goodsCategory"
 									  :rules="[{ required: true, message: '商品分类不能为空',trigger: 'change'}]">
-									  <el-cascader
-									  	<el-cascader
+											<el-cascader
 												v-if="goodsForm.goodsCategory"
-									  		style="width: 100%;"
-									  		clearable
-												@change="handleClickNode"
-									  		:show-all-levels="false"
-									  		:props="{ checkStrictly: true, 
+												:options="category"
+												v-model="goodsForm.goodsCategory"
+												:props="{ checkStrictly: true, 
 									  							value:'categoryCode',
 									  							label:'categoryName',
-									  							children:'childrenCategory'}"
-									  	  v-model="goodsForm.goodsCategory"
-									  	  :options="category"></el-cascader>
+									  							children:'childrenCategory' }"
+												clearable>
+											</el-cascader>
+									</el-form-item>
+									<el-form-item
+										v-if="!id"
+									  label="商品分类"
+									  prop="goodsCategory"
+									  :rules="[{ required: true, message: '商品分类不能为空',trigger: 'change'}]">
+											<el-cascader
+												:options="category"
+												v-model="goodsForm.goodsCategory"
+												:props="{ checkStrictly: true, 
+									  							value:'categoryCode',
+									  							label:'categoryName',
+									  							children:'childrenCategory' }"
+												clearable>
+											</el-cascader>
 									</el-form-item>
 									<el-form-item
 									  label="库存"
@@ -76,9 +89,27 @@
 											v-model.number="goodsForm.stock" 
 											clearable></el-input>
 									</el-form-item>
+									<el-form-item 
+										label="商品机构" 
+										prop="orgCode" 
+										:rules="[{ required: true, message: '商品机构不能为空'}]"
+										v-if="isAdmin">
+									  <el-cascader
+											style="width: 100%;"
+											:options="orgList"
+											v-model="goodsForm.orgCode"
+											@change="onHandleChangeNode"
+											:show-all-levels="false"
+											:props="{ multiple: false,expandTrigger: 'hover', checkStrictly: false, label:'orgName',value:'orgCode',children:'childrenOrg', emitPath:false }"
+											clearable>
+										</el-cascader>
+									</el-form-item>
 								  <el-form-item>
-								    <el-button type="primary" @click="submitForm('goodsForm')">{{id?'更 新':'添加'}}</el-button>
-								    <el-button @click="resetForm('goodsForm')">重 置</el-button>
+								    <el-button 
+											type="primary" 
+											@click="submitForm('goodsForm')">{{id?'更 新':'添加'}}</el-button>
+								    <el-button 
+											@click="resetForm('goodsForm')">取消</el-button>
 								  </el-form-item>
 								</el-form>
 							</div>
@@ -91,11 +122,12 @@
 </template>
 
 <script>
-	import BaseTabs from '../../../components/BaseTabs.vue'
+	import BaseTabs from '@/components/BaseTabs.vue'
 	import {queryGoodsCategoryTreeAPI,
 					addGoodsAPI,
 					updateGoodsAPI,
-					queryGoodsDetailAPI} from '../../../api/mall.js'
+					queryGoodsDetailAPI} from '@/api/mall.js'
+	import api from '@/api/api.js'
 	export default {
 		components:{
 			BaseTabs
@@ -107,19 +139,48 @@
 				category:[],
 				bounceOut:'',
 				options:[],
+				orgList:[],
 				baseTabs: [{label: '添加商品',value: '1'}],
 				goodsForm:{
 					goodsName:'',
 					goodsDesc:'',
 					goodsCategory:[],
 					needIntegral:'',
-					stock:''
+					stock:'',
+					orgCode:this.$store.state.userInfo.projectDepartment=='admin'?'':this.$store.state.userInfo.projectDepartment
 				}
 			}
 		},
+		computed:{
+			isAdmin(){
+				return this.$store.state.userInfo.projectDepartment=='admin'?true:false
+			}
+		},
 		methods: {
+			querySysOrgByPage(params){
+				api.getSysOrgTreeAPI(params).then(res=>{
+					// // console.log('机构列表',res.data);
+					if(res.code==0){
+						this._handleOrgList(res.data)
+						this.orgList=res.data[0].childrenOrg
+					}
+				})
+			},
+			_handleOrgList(arr){
+				arr.forEach(item=>{
+					item.childrenOrg.forEach(each=>{
+						delete each.childrenOrg
+					})
+				})
+			},
+			onHandleChangeNode(value){
+				// console.log(value);
+				this.goodsForm.orgCode=value
+			},
 			handleClickNode(node){
 				// console.log(node);
+				// console.log(this.goodsForm);
+				this.goodsForm.goodsCategory=node
 			},
 			submitForm(formName) {
 				this.$refs[formName].validate((valid) => {
@@ -186,6 +247,7 @@
 					this.goodsForm.needIntegral=res.data.needIntegral
 					this.goodsForm.goodsDesc=res.data.goodsDesc
 					this.goodsForm.stock=res.data.stock
+					this.goodsForm.orgCode=res.data.orgCode
 					if(res.data.parentCategoryCode){
 						this.goodsForm.goodsCategory.push(res.data.parentCategoryCode)
 						this.goodsForm.goodsCategory.push(res.data.goodsCategory)
@@ -198,11 +260,14 @@
 		},
 		created() {
 			this.id=this.$route.query.id?this.$route.query.id:null
-			this.goodsForm.goodsCategory=[]
+			// this.goodsForm.goodsCategory=[]
 			this.queryGoodsCategoryTree()
+			this.querySysOrgByPage()
 			if(this.id){
 				this.queryGoodsDetail({id:this.id})
 			}
+		},
+		mounted() {
 		}
 	}
 </script>

@@ -60,29 +60,30 @@
 							tooltip-effect="dark"
 							max-height="250">
 							<el-table-column
-								label="编号"
-								prop="id"
+								type="index"
 								width="55"
-								align="center"
-								>
+								align="center">
 							</el-table-column>
 							<el-table-column
 								label="姓名"
-								prop="studentName"
+								prop="userName"	
 								align="center"
 								>
 							</el-table-column>
 							<el-table-column
-								label="总分"
-								prop="sumScore"
-								align="center"
-								>
+								label="是否完成"
+								align="center">
+								<template slot-scope="scope">
+									<span v-if="scope.row.isDone==0" style="color: red;">未完成</span>
+									<span v-else style="color: green;">已完成</span>
+								</template>
 							</el-table-column>
 							<el-table-column
-								label="编码"
-								prop="studentCode"
-								align="center"
-								>
+								label="分数"
+								align="center">
+								<template slot-scope="scope">
+									<span>{{scope.row.isDone==0?0:scope.row.score}}</span>
+								</template>
 							</el-table-column>
 						</el-table>
 					</el-form-item>

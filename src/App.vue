@@ -1,19 +1,22 @@
 <template>
   <div id="app">
-    <router-view v-if="isRouterAlive"/>
+    <router-view />
   </div>
 </template>
 
 <script>
 export default {
-    provide() {
+		components:{
+		},
+    provide() {	
         return {
-            reloadAll: this.reloadAll
+            reloadAll: this.reloadAll,
         }
     },
     data() {
         return {
-            isRouterAlive: true
+            isRouterAlive: true,
+						loading:null
         }
     },
     methods: {
@@ -22,10 +25,26 @@ export default {
             this.$nextTick(() => {
                 this.isRouterAlive = true
             })
-        }
-    }
+        },
+				
+    },
+		created() {
+			this.$store.commit('initUser')
+		}
 }
 </script>
 
-<style lang="less">
+<style >
+	@import url("./utils/css/bootstrap.min.css");
+	.point{
+		cursor: pointer;
+	}
+	.hide-scollBar{
+		overflow-y: scroll;
+		-ms-overflow-style: none;
+		overflow: -moz-scrollbars-none;
+	}
+	.hide-scollBar::-webkit-scrollbar {
+		width: 0 !important;
+	}
 </style>

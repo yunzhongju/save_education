@@ -24,7 +24,7 @@ export default {
 	},
 	//退出登陆
 	loginOutAPI(data) {
-		return httpRequest(baseUrl.Login.loginOut, data)
+		return httpRequest(baseUrl.Login.loginOut, data,1)
 	},
 	//加载当前登录用户的菜单
 	loadUserMenuAPI(data) {
@@ -36,7 +36,11 @@ export default {
 	 * 用户管理
 	 */
 	//分页查询用户信息列表
-	querySysUserByPageAPI(data) {
+	querySysUserByOrgCodeAPI(data) {
+		return httpRequest(baseUrl.User.querySysUserByOrgCode, data, 1)
+	},
+	//分页查询用户信息列表2
+	querySysUserByPageGroupAPI(data) {
 		return httpRequest(baseUrl.User.querySysUserByPage, data, 1)
 	},
 	//查询用户详细信息
@@ -666,4 +670,30 @@ export default {
 	attendanceRecoedPageAPI(data) {
 		return httpRequest(baseUrl.AttendanceGroup.attendanceRecoedPage, data, 1)
 	},
+	
+	
+	//获取登录记录
+	queryLoginRecordAPI(data){
+		return httpRequest('queryLoginRecord.do',data,1)
+	},
+	//获取浏览记录
+	queryBrowseRecordByPageAPI(data){
+		return httpRequest('queryBrowseRecordByPage.do',data,1)
+	},
+	//积分
+	queryIntegralRecordAPI(data){
+		return httpRequest('queryIntegralRecord.do',data,1)
+	},
+	//考勤
+	attendanceRecordAPI(data){
+		return httpRequest('attendanceRecord/page.do',data,1)
+	},
+	//统计
+	getStatisticsDataAPI(data){
+		return httpRequest('getStatisticsData.do',data,1)
+	},
+	//统计
+	queryAttendanceStatistics(data){
+		return httpRequest('/attendanceRecord/queryAttendanceStatistics.do',data,1)
+	}
 }

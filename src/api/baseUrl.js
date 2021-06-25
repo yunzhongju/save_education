@@ -15,8 +15,10 @@ export default {
 		updateSysMenu: "updateSysMenu.do", //更新菜单信息
 	},
 	User: {
-		querySysUserByPage: 'querySysUserByPage.do', //分页查询用户信息列表
-		getUserList: 'getUserList.do', //查询用户信息列表
+		querySysUserByPage: 'querySysUserByPage.do', //分页查询用户信息列表组
+		querySysUserByOrgCode: 'querySysUserByOrgCode.do', //分页查询用户信息列表
+		// getUserList: 'getUserList.do', //查询用户信息列表
+		getUserList: 'getUserListByOrgCode.do', //查询用户信息列表
 		querySysUserDetail: 'querySysUserDetail.do', //查询用户详细信息
 		addSysUser: 'addSysUser.do', //新增用户信息
 		updateSysUser: 'updateSysUser.do', //修改用户信息
@@ -181,5 +183,8 @@ export default {
 		attendanceGroupPage: "/attendanceGroup/page.do", //查询考勤组列表
 		attendanceGroupDetail: "/attendanceGroup/detail.do", //查询考勤组详情
 		attendanceRecoedPage: "/attendanceRecord/page.do", //查询考勤记录
+	},
+	AttendanceRecord:{
+		queryAttendanceStatistics:'/attendanceRecord/queryAttendanceStatistics.do'
 	}
 }
